@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { StyleSheet, View, TouchableOpacity, Animated } from "react-native";
-import { ThemedText } from "./themed-text";
+import { ThemedText } from "../themed-text";
+import { Colors, Shadows, Spacing } from "../../constants/theme";
+import { useColorScheme } from "../../hooks/use-color-scheme";
 
 export default function FloatingMenu() {
   const [open, setOpen] = useState(false);
+  const colorScheme = useColorScheme();
+  const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
 
   // animation values
   const anim1 = new Animated.Value(0);
@@ -20,13 +24,16 @@ export default function FloatingMenu() {
     ]).start();
   };
 
+  const btnColor = { backgroundColor: colors.softGreenTheme };
+
   return (
     <View style={styles.container}>
-
       {/* Small buttons */}
       <Animated.View
         style={[
           styles.smallBtn,
+          btnColor,
+          Shadows.medium,
           {
             transform: [
               { scale: anim1 },
@@ -39,6 +46,8 @@ export default function FloatingMenu() {
       <Animated.View
         style={[
           styles.smallBtn,
+          btnColor,
+          Shadows.medium,
           {
             transform: [
               { scale: anim2 },
@@ -52,6 +61,8 @@ export default function FloatingMenu() {
       <Animated.View
         style={[
           styles.smallBtn,
+          btnColor,
+          Shadows.medium,
           {
             transform: [
               { scale: anim3 },
@@ -62,10 +73,13 @@ export default function FloatingMenu() {
       />
 
       {/* Main FAB */}
-      <TouchableOpacity style={styles.fab} onPress={toggleMenu}>
-        <ThemedText style={{ fontSize: 20 }}>≡</ThemedText>
+      <TouchableOpacity 
+        style={[styles.fab, { backgroundColor: "rgba(76, 175, 80, 0.95)" }, Shadows.strong]} 
+        onPress={toggleMenu} 
+        activeOpacity={0.8}
+      >
+        <ThemedText style={{ fontSize: 24, color: "#FFF" }}>≡</ThemedText>
       </TouchableOpacity>
-
     </View>
   );
 }
@@ -73,23 +87,21 @@ export default function FloatingMenu() {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 20,
-    right: 20,
+    bottom: Spacing.xl,
+    right: Spacing.xl,
     alignItems: "center",
   },
   fab: {
-    width: 67,
-    height: 67,
-    borderRadius: 30,
-    backgroundColor: "#A8D5BA",
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     justifyContent: "center",
     alignItems: "center",
   },
   smallBtn: {
     position: "absolute",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#A8D5BA",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
 });

@@ -15,9 +15,11 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
-
         {/* Login */}
         <Stack.Screen name="login" />
+
+        {/* Admin Profile */}
+        <Stack.Screen name="admin-login" />
 
         {/* Signup */}
         <Stack.Screen name="signup" />

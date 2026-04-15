@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { StyleSheet, View, TouchableOpacity, Animated } from "react-native";
-import { ThemedText } from "../themed-text";
+import { Animated, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Colors, Shadows, Spacing } from "../../constants/theme";
 import { useColorScheme } from "../../hooks/use-color-scheme";
+import { ThemedText } from "../themed-text";
 interface FloatingMenuProps {
   onMainPress?: () => void;
 }
@@ -16,14 +16,26 @@ export default function FloatingMenu({ onMainPress }: FloatingMenuProps) {
   const anim1 = new Animated.Value(0);
   const anim2 = new Animated.Value(0);
   const anim3 = new Animated.Value(0);
- 
+
   const toggleMenu = () => {
     setOpen(!open);
 
     Animated.stagger(50, [
-      Animated.timing(anim1, { toValue: open ? 0 : 1, duration: 200, useNativeDriver: true }),
-      Animated.timing(anim2, { toValue: open ? 0 : 1, duration: 200, useNativeDriver: true }),
-      Animated.timing(anim3, { toValue: open ? 0 : 1, duration: 200, useNativeDriver: true }),
+      Animated.timing(anim1, {
+        toValue: open ? 0 : 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(anim2, {
+        toValue: open ? 0 : 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(anim3, {
+        toValue: open ? 0 : 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
     ]).start();
   };
 
@@ -40,9 +52,14 @@ export default function FloatingMenu({ onMainPress }: FloatingMenuProps) {
           {
             transform: [
               { scale: anim1 },
-              { translateY: anim1.interpolate({ inputRange: [0, 1], outputRange: [0, -80] }) }
-            ]
-          }
+              {
+                translateY: anim1.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -80],
+                }),
+              },
+            ],
+          },
         ]}
       />
 
@@ -54,10 +71,20 @@ export default function FloatingMenu({ onMainPress }: FloatingMenuProps) {
           {
             transform: [
               { scale: anim2 },
-              { translateX: anim2.interpolate({ inputRange: [0, 1], outputRange: [0, -60] }) },
-              { translateY: anim2.interpolate({ inputRange: [0, 1], outputRange: [0, -60] }) }
-            ]
-          }
+              {
+                translateX: anim2.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -60],
+                }),
+              },
+              {
+                translateY: anim2.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -60],
+                }),
+              },
+            ],
+          },
         ]}
       />
 
@@ -69,15 +96,24 @@ export default function FloatingMenu({ onMainPress }: FloatingMenuProps) {
           {
             transform: [
               { scale: anim3 },
-              { translateX: anim3.interpolate({ inputRange: [0, 1], outputRange: [0, -80] }) }
-            ]
-          }
+              {
+                translateX: anim3.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, -80],
+                }),
+              },
+            ],
+          },
         ]}
       />
 
       {/* Main FAB */}
-      <TouchableOpacity 
-        style={[styles.fab, { backgroundColor: "rgba(76, 175, 80, 0.95)" }, Shadows.strong]} 
+      <TouchableOpacity
+        style={[
+          styles.fab,
+          { backgroundColor: "rgba(76, 175, 80, 0.95)" },
+          Shadows.strong,
+        ]}
         onPress={onMainPress ? onMainPress : toggleMenu}
         activeOpacity={0.8}
       >

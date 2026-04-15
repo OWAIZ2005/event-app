@@ -1,3 +1,7 @@
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Colors, Radii, Shadows, Spacing } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -10,10 +14,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Colors, Spacing, Radii, Shadows } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
@@ -44,7 +44,10 @@ export default function LoginScreen() {
       >
         <ThemedView style={styles.container}>
           <View style={styles.content}>
-            <ThemedText type="title" style={[styles.loginTitle, { color: colors.primary }]}>
+            <ThemedText
+              type="title"
+              style={[styles.loginTitle, { color: colors.primary }]}
+            >
               LOGIN
             </ThemedText>
 
@@ -87,13 +90,19 @@ export default function LoginScreen() {
                 style={[
                   styles.roleButton,
                   {
-                    backgroundColor: role === "club" ? colors.primary : "#E0E0E0",
+                    backgroundColor:
+                      role === "club" ? colors.primary : "#E0E0E0",
                   },
                 ]}
                 onPress={() => setRole("club")}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.roleText, { color: role === "club" ? "#fff" : "#000" }]}>
+                <Text
+                  style={[
+                    styles.roleText,
+                    { color: role === "club" ? "#fff" : "#000" },
+                  ]}
+                >
                   Club
                 </Text>
               </TouchableOpacity>
@@ -102,13 +111,19 @@ export default function LoginScreen() {
                 style={[
                   styles.roleButton,
                   {
-                    backgroundColor: role === "student" ? colors.primary : "#E0E0E0",
+                    backgroundColor:
+                      role === "student" ? colors.primary : "#E0E0E0",
                   },
                 ]}
                 onPress={() => setRole("student")}
                 activeOpacity={0.8}
               >
-                <Text style={[styles.roleText, { color: role === "student" ? "#fff" : "#000" }]}>
+                <Text
+                  style={[
+                    styles.roleText,
+                    { color: role === "student" ? "#fff" : "#000" },
+                  ]}
+                >
                   Student
                 </Text>
               </TouchableOpacity>
@@ -131,7 +146,9 @@ export default function LoginScreen() {
               onPress={handleSignUp}
               activeOpacity={0.8}
             >
-              <ThemedText style={[styles.signUpText, { color: colors.primary }]}>
+              <ThemedText
+                style={[styles.signUpText, { color: colors.primary }]}
+              >
                 Sign Up
               </ThemedText>
             </TouchableOpacity>

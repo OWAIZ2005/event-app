@@ -15,7 +15,6 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
-
         {/* Login */}
         <Stack.Screen name="login" />
 
@@ -31,7 +30,6 @@ export default function RootLayout() {
         {/* admin profile */}
         <Stack.Screen name="admin-dashboard" />
 
-
         {/* Main tabs (dashboard, explore, my-events) */}
         <Stack.Screen name="(tabs)" />
 
@@ -42,7 +40,6 @@ export default function RootLayout() {
         />
 
         <Stack.Screen name="event_info" />
-
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

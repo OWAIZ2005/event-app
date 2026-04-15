@@ -1,6 +1,13 @@
-import { useWindowDimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import { Colors, Radii, Shadows, Spacing } from "../constants/theme";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { Colors, Radii, Shadows } from "../constants/theme";
 import { useColorScheme } from "../hooks/use-color-scheme";
 
 export default function AdminDashboard() {
@@ -8,23 +15,26 @@ export default function AdminDashboard() {
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
   const { width } = useWindowDimensions();
 
-  const smallCardSize = width * 0.32;   // FIXED size
+  const smallCardSize = width * 0.32; // FIXED size
   const largeCardHeight = width * 0.5;
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
-
       <ScrollView showsVerticalScrollIndicator={false}>
-
         {/* Top Right Circle */}
         <View style={styles.topContainer}>
           <TouchableOpacity
-            style={[styles.topCircle, { backgroundColor: colors.softGreenTheme }]}
+            style={[
+              styles.topCircle,
+              { backgroundColor: colors.softGreenTheme },
+            ]}
           />
         </View>
 
         {/* Past Events */}
-        <Text style={[styles.heading, { color: colors.text }]}>Past Events</Text>
+        <Text style={[styles.heading, { color: colors.text }]}>
+          Past Events
+        </Text>
 
         <ScrollView
           horizontal
@@ -50,10 +60,7 @@ export default function AdminDashboard() {
         {/* My Events */}
         <Text style={[styles.heading, { color: colors.text }]}>My Events</Text>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          nestedScrollEnabled
-        >
+        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
           {Array.from({ length: 5 }).map((_, index) => (
             <View key={index} style={styles.block}>
               <View
@@ -71,20 +78,16 @@ export default function AdminDashboard() {
                 </TouchableOpacity>
               </View>
 
-              {index === 0 && (
-                <Text style={styles.swipe}>Swipe to delete</Text>
-              )}
+              {index === 0 && <Text style={styles.swipe}>Swipe to delete</Text>}
             </View>
           ))}
         </ScrollView>
-
       </ScrollView>
 
       {/* Bottom + Button */}
       <TouchableOpacity style={styles.fab}>
         <FontAwesome name="plus" size={24} color="#000" />
       </TouchableOpacity>
-
     </View>
   );
 }

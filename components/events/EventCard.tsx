@@ -1,8 +1,8 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
-import { ThemedView } from "../themed-view";
-import { ThemedText } from "../themed-text";
-import { Colors, Radii, Spacing, Shadows } from "../../constants/theme";
+import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
 import { useColorScheme } from "../../hooks/use-color-scheme";
+import { ThemedText } from "../themed-text";
+import { ThemedView } from "../themed-view";
 
 interface EventCardProps {
   title: string;
@@ -14,14 +14,31 @@ interface EventCardProps {
   onAdminActionPress?: () => void;
 }
 
-export default function EventCard({ title, date, location, onPress, showAdminAction = false, adminActionText = "Edit", onAdminActionPress}: EventCardProps) {
+export default function EventCard({
+  title,
+  date,
+  location,
+  onPress,
+  showAdminAction = false,
+  adminActionText = "Edit",
+  onAdminActionPress,
+}: EventCardProps) {
   const colorScheme = useColorScheme();
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <ThemedView style={[styles.card, { backgroundColor: colors.cardGreenBg }, Shadows.light]}>
-        <ThemedText style={[styles.title, { color: colors.text }]} type="defaultSemiBold">
+      <ThemedView
+        style={[
+          styles.card,
+          { backgroundColor: colors.cardGreenBg },
+          Shadows.light,
+        ]}
+      >
+        <ThemedText
+          style={[styles.title, { color: colors.text }]}
+          type="defaultSemiBold"
+        >
           {title}
         </ThemedText>
         <ThemedText style={[styles.sub, { color: colors.subText }]}>
@@ -35,10 +52,12 @@ export default function EventCard({ title, date, location, onPress, showAdminAct
           >
             <ThemedText style={{ fontSize: 12, textAlign: "center" }}>
               {adminActionText}
-        </ThemedText>
+            </ThemedText>
           </TouchableOpacity>
         ) : (
-          <ThemedView style={[styles.btn, { backgroundColor: colors.softGreenTheme }]} />
+          <ThemedView
+            style={[styles.btn, { backgroundColor: colors.softGreenTheme }]}
+          />
         )}
       </ThemedView>
     </TouchableOpacity>

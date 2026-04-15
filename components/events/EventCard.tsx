@@ -9,9 +9,12 @@ interface EventCardProps {
   date: string;
   location: string;
   onPress?: () => void;
+  showAdminAction?: boolean;
+  adminActionText?: string;
+  onAdminActionPress?: () => void;
 }
 
-export default function EventCard({ title, date, location, onPress }: EventCardProps) {
+export default function EventCard({ title, date, location, onPress, showAdminAction = false, adminActionText = "Edit", onAdminActionPress}: EventCardProps) {
   const colorScheme = useColorScheme();
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
 
@@ -24,7 +27,19 @@ export default function EventCard({ title, date, location, onPress }: EventCardP
         <ThemedText style={[styles.sub, { color: colors.subText }]}>
           {date} • {location}
         </ThemedText>
-        <ThemedView style={[styles.btn, { backgroundColor: colors.softGreenTheme }]} />
+        {showAdminAction ? (
+          <TouchableOpacity
+            style={[styles.btn, { backgroundColor: colors.softGreenTheme }]}
+            onPress={onAdminActionPress}
+            activeOpacity={0.8}
+          >
+            <ThemedText style={{ fontSize: 12, textAlign: "center" }}>
+              {adminActionText}
+        </ThemedText>
+          </TouchableOpacity>
+        ) : (
+          <ThemedView style={[styles.btn, { backgroundColor: colors.softGreenTheme }]} />
+        )}
       </ThemedView>
     </TouchableOpacity>
   );

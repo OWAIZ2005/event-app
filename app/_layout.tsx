@@ -28,6 +28,10 @@ export default function RootLayout() {
           options={{ gestureEnabled: true }}
         />
 
+        {/* admin profile */}
+        <Stack.Screen name="admin-dashboard" />
+
+
         {/* Main tabs (dashboard, explore, my-events) */}
         <Stack.Screen name="(tabs)" />
 

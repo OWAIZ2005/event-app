@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors, Spacing, Radii, Shadows } from "@/constants/theme";
@@ -19,13 +18,18 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"student" | "club">("student");
   const colorScheme = useColorScheme();
   const router = useRouter();
 
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
 
   const handleLogin = () => {
-    router.replace("/(tabs)");
+    if (role === "club") {
+      router.replace("/admin-dashboard");
+    } else {
+      router.replace("/(tabs)");
+    }
   };
 
   const handleSignUp = () => {
@@ -40,13 +44,10 @@ export default function LoginScreen() {
       >
         <ThemedView style={styles.container}>
           <View style={styles.content}>
-
-            {/* LOGIN Title */}
             <ThemedText type="title" style={[styles.loginTitle, { color: colors.primary }]}>
               LOGIN
             </ThemedText>
 
-            {/* Username Input */}
             <TextInput
               style={[
                 styles.input,
@@ -60,11 +61,9 @@ export default function LoginScreen() {
               placeholderTextColor={colors.subText}
               value={username}
               onChangeText={setUsername}
-              editable
               maxLength={50}
             />
 
-            {/* Password Input */}
             <TextInput
               style={[
                 styles.input,
@@ -82,7 +81,39 @@ export default function LoginScreen() {
               maxLength={100}
             />
 
-            {/* LOGIN Button */}
+            {/* Role selection (Student / Club) */}
+            <View style={styles.roleRow}>
+              <TouchableOpacity
+                style={[
+                  styles.roleButton,
+                  {
+                    backgroundColor: role === "club" ? colors.primary : "#E0E0E0",
+                  },
+                ]}
+                onPress={() => setRole("club")}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.roleText, { color: role === "club" ? "#fff" : "#000" }]}>
+                  Club
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.roleButton,
+                  {
+                    backgroundColor: role === "student" ? colors.primary : "#E0E0E0",
+                  },
+                ]}
+                onPress={() => setRole("student")}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.roleText, { color: role === "student" ? "#fff" : "#000" }]}>
+                  Student
+                </Text>
+              </TouchableOpacity>
+            </View>
+
             <TouchableOpacity
               style={[
                 styles.loginButton,
@@ -95,12 +126,8 @@ export default function LoginScreen() {
               <Text style={styles.loginButtonText}>LOGIN</Text>
             </TouchableOpacity>
 
-            {/* Sign Up Link */}
             <TouchableOpacity
-              style={[
-                styles.signUpButton,
-                { borderColor: colors.primary },
-              ]}
+              style={[styles.signUpButton, { borderColor: colors.primary }]}
               onPress={handleSignUp}
               activeOpacity={0.8}
             >
@@ -108,7 +135,6 @@ export default function LoginScreen() {
                 Sign Up
               </ThemedText>
             </TouchableOpacity>
-
           </View>
         </ThemedView>
       </KeyboardAvoidingView>
@@ -134,7 +160,6 @@ const styles = StyleSheet.create({
     fontSize: 42,
     fontWeight: "900",
     marginBottom: Spacing.xxl,
-    fontStyle: "normal",
     textAlign: "center",
     letterSpacing: 1,
   },
@@ -147,6 +172,22 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "600",
     borderWidth: 1,
+  },
+  roleRow: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 16,
+  },
+  roleButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  roleText: {
+    fontSize: 16,
+    fontWeight: "700",
   },
   loginButton: {
     width: "55%",

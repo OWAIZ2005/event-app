@@ -3,8 +3,11 @@ import { StyleSheet, View, TouchableOpacity, Animated } from "react-native";
 import { ThemedText } from "../themed-text";
 import { Colors, Shadows, Spacing } from "../../constants/theme";
 import { useColorScheme } from "../../hooks/use-color-scheme";
+interface FloatingMenuProps {
+  onMainPress?: () => void;
+}
 
-export default function FloatingMenu() {
+export default function FloatingMenu({ onMainPress }: FloatingMenuProps) {
   const [open, setOpen] = useState(false);
   const colorScheme = useColorScheme();
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
@@ -75,7 +78,7 @@ export default function FloatingMenu() {
       {/* Main FAB */}
       <TouchableOpacity 
         style={[styles.fab, { backgroundColor: "rgba(76, 175, 80, 0.95)" }, Shadows.strong]} 
-        onPress={toggleMenu} 
+        onPress={onMainPress ? onMainPress : toggleMenu}
         activeOpacity={0.8}
       >
         <ThemedText style={{ fontSize: 24, color: "#FFF" }}>≡</ThemedText>

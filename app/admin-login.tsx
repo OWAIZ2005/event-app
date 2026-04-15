@@ -1,8 +1,3 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Colors, Radii, Shadows, Spacing } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -15,31 +10,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function LoginScreen() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { Colors, Radii, Shadows, Spacing } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+
+export default function AdminProfileScreen() {
+  const [name, setName] = useState("");
+  const [department, setDepartment] = useState("");
+  const [email, setEmail] = useState("");
   const colorScheme = useColorScheme();
-  const router = useRouter();
 
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
-
-  const handleLogin = () => {
-  const user = username.trim();
-  const pass = password.trim();
-
-  // Hardcoded club login
-  if (user === "IEEECS" && pass === "IEEECS123") {
-    router.replace("/admin-dashboard");
-    return;
-  }
-
-  // Default → student
-  router.replace("/(tabs)");
-};
-
-  const handleSignUp = () => {
-    router.push("/signup");
-  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -49,13 +31,15 @@ export default function LoginScreen() {
       >
         <ThemedView style={styles.container}>
           <View style={styles.content}>
+            {/* ADMIN PROFILE Title */}
             <ThemedText
               type="title"
-              style={[styles.loginTitle, { color: colors.primary }]}
+              style={[styles.profileTitle, { color: colors.primary }]}
             >
-              LOGIN
+              ADMIN PROFILE
             </ThemedText>
 
+            {/* Name Input */}
             <TextInput
               style={[
                 styles.input,
@@ -65,13 +49,15 @@ export default function LoginScreen() {
                   borderColor: colors.border,
                 },
               ]}
-              placeholder="Username:"
+              placeholder="Name"
               placeholderTextColor={colors.subText}
-              value={username}
-              onChangeText={setUsername}
+              value={name}
+              onChangeText={setName}
+              editable
               maxLength={50}
             />
 
+            {/* Department Input */}
             <TextInput
               style={[
                 styles.input,
@@ -81,36 +67,42 @@ export default function LoginScreen() {
                   borderColor: colors.border,
                 },
               ]}
-              placeholder="Password:"
+              placeholder="Department"
               placeholderTextColor={colors.subText}
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
+              value={department}
+              onChangeText={setDepartment}
+              maxLength={50}
+            />
+
+            {/* Email Input */}
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.surface,
+                  color: colors.text,
+                  borderColor: colors.border,
+                },
+              ]}
+              placeholder="Email ID"
+              placeholderTextColor={colors.subText}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
               maxLength={100}
             />
 
+            {/* Change Password Button */}
             <TouchableOpacity
               style={[
-                styles.loginButton,
+                styles.actionButton,
                 { backgroundColor: colors.primary },
                 Shadows.medium,
               ]}
-              onPress={handleLogin}
               activeOpacity={0.8}
             >
-              <Text style={styles.loginButtonText}>LOGIN</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.signUpButton, { borderColor: colors.primary }]}
-              onPress={handleSignUp}
-              activeOpacity={0.8}
-            >
-              <ThemedText
-                style={[styles.signUpText, { color: colors.primary }]}
-              >
-                Sign Up
-              </ThemedText>
+              <Text style={styles.actionButtonText}>Change Password</Text>
             </TouchableOpacity>
           </View>
         </ThemedView>
@@ -133,10 +125,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     width: "100%",
   },
-  loginTitle: {
+  profileTitle: {
     fontSize: 42,
     fontWeight: "900",
     marginBottom: Spacing.xxl,
+    fontStyle: "normal",
     textAlign: "center",
     letterSpacing: 1,
   },
@@ -150,32 +143,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     borderWidth: 1,
   },
-  loginButton: {
-    width: "55%",
+  actionButton: {
+    width: "100%",
     height: 55,
     borderRadius: Radii.md,
-    justifyContent: "center",
     alignItems: "center",
-    marginTop: Spacing.xl,
-    marginBottom: Spacing.xl,
-  },
-  loginButtonText: {
-    color: "#fff",
-    fontSize: 19,
-    fontWeight: "900",
-    letterSpacing: 0.5,
-  },
-  signUpButton: {
-    width: "55%",
-    height: 50,
-    borderRadius: Radii.md,
     justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
+    marginTop: Spacing.lg,
   },
-  signUpText: {
+  actionButtonText: {
     fontSize: 17,
-    fontWeight: "700",
-    textAlign: "center",
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
 });

@@ -18,6 +18,9 @@ export default function RootLayout() {
         {/* Login */}
         <Stack.Screen name="login" />
 
+        {/* Admin Profile */}
+        <Stack.Screen name="admin-login" />
+
         {/* Signup */}
         <Stack.Screen name="signup" />
 

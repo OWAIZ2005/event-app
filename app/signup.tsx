@@ -29,7 +29,11 @@ export default function SignUpScreen() {
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
 
   const handleSignIn = () => {
+  if (role === "club") {
+    router.replace("/admin-dashboard");
+  } else {
     router.replace("/(tabs)");
+  }
   };
 
   return (

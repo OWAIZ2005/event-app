@@ -1,7 +1,7 @@
 import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
+    DarkTheme,
+    DefaultTheme,
+    ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -32,6 +32,9 @@ export default function RootLayout() {
 
         {/* admin profile */}
         <Stack.Screen name="admin-dashboard" />
+
+        {/* Edit Event */}
+        <Stack.Screen name="edit-event" />
 
         {/* Main tabs (dashboard, explore, my-events) */}
         <Stack.Screen name="(tabs)" />

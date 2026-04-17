@@ -18,19 +18,24 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"student" | "club">("student");
   const colorScheme = useColorScheme();
   const router = useRouter();
 
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
 
   const handleLogin = () => {
-    if (role === "club") {
-      router.replace("/admin-dashboard");
-    } else {
-      router.replace("/(tabs)");
-    }
-  };
+  const user = username.trim();
+  const pass = password.trim();
+
+  // Hardcoded club login
+  if (user === "IEEECS" && pass === "IEEECS123") {
+    router.replace("/admin-dashboard");
+    return;
+  }
+
+  // Default → student
+  router.replace("/(tabs)");
+};
 
   const handleSignUp = () => {
     router.push("/signup");
@@ -83,51 +88,6 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               maxLength={100}
             />
-
-            {/* Role selection (Student / Club) */}
-            <View style={styles.roleRow}>
-              <TouchableOpacity
-                style={[
-                  styles.roleButton,
-                  {
-                    backgroundColor:
-                      role === "club" ? colors.primary : "#E0E0E0",
-                  },
-                ]}
-                onPress={() => setRole("club")}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={[
-                    styles.roleText,
-                    { color: role === "club" ? "#fff" : "#000" },
-                  ]}
-                >
-                  Club
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.roleButton,
-                  {
-                    backgroundColor:
-                      role === "student" ? colors.primary : "#E0E0E0",
-                  },
-                ]}
-                onPress={() => setRole("student")}
-                activeOpacity={0.8}
-              >
-                <Text
-                  style={[
-                    styles.roleText,
-                    { color: role === "student" ? "#fff" : "#000" },
-                  ]}
-                >
-                  Student
-                </Text>
-              </TouchableOpacity>
-            </View>
 
             <TouchableOpacity
               style={[
@@ -189,22 +149,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "600",
     borderWidth: 1,
-  },
-  roleRow: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 16,
-  },
-  roleButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  roleText: {
-    fontSize: 16,
-    fontWeight: "700",
   },
   loginButton: {
     width: "55%",

@@ -1,4 +1,5 @@
 import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import {
   ScrollView,
   StyleSheet,
@@ -11,6 +12,7 @@ import { Colors, Radii, Shadows } from "../constants/theme";
 import { useColorScheme } from "../hooks/use-color-scheme";
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const colorScheme = useColorScheme();
   const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
   const { width } = useWindowDimensions();
@@ -42,18 +44,22 @@ export default function AdminDashboard() {
           contentContainerStyle={styles.row}
         >
           {Array.from({ length: 5 }).map((_, index) => (
-            <View
+            <TouchableOpacity
               key={index}
-              style={[
-                styles.smallCard,
-                {
-                  width: smallCardSize,
-                  height: smallCardSize,
-                  backgroundColor: colors.cardGreenBg,
-                },
-                Shadows.light,
-              ]}
-            />
+              onPress={() => router.push("/edit-event")}
+            >
+              <View
+                style={[
+                  styles.smallCard,
+                  {
+                    width: smallCardSize,
+                    height: smallCardSize,
+                    backgroundColor: colors.cardGreenBg,
+                  },
+                  Shadows.light,
+                ]}
+              />
+            </TouchableOpacity>
           ))}
         </ScrollView>
 
@@ -63,20 +69,22 @@ export default function AdminDashboard() {
         <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
           {Array.from({ length: 5 }).map((_, index) => (
             <View key={index} style={styles.block}>
-              <View
-                style={[
-                  styles.largeCard,
-                  {
-                    height: largeCardHeight,
-                    backgroundColor: colors.cardGreenBg,
-                  },
-                  Shadows.light,
-                ]}
-              >
-                <TouchableOpacity style={styles.editBtn}>
-                  <Text style={styles.editText}>Edit</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity onPress={() => router.push("/edit-event")}>
+                <View
+                  style={[
+                    styles.largeCard,
+                    {
+                      height: largeCardHeight,
+                      backgroundColor: colors.cardGreenBg,
+                    },
+                    Shadows.light,
+                  ]}
+                >
+                  <TouchableOpacity style={styles.editBtn}>
+                    <Text style={styles.editText}>Edit</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
 
               {index === 0 && <Text style={styles.swipe}>Swipe to delete</Text>}
             </View>

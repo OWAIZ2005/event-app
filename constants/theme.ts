@@ -37,7 +37,7 @@ export const Colors = {
     icon: "#9BA1A6",
     tabIconDefault: "#9BA1A6",
     tabIconSelected: tintColorDark,
-    successGreen: "#4ADE80",
+    successGreen: "#1CB944",
     lightGreenBg: "#1C2E20", // Dark subtle green
     cardGreenBg: "#2E4C34",
     softGreenTheme: "#66BB6A",

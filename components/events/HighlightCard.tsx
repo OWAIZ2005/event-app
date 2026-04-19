@@ -13,14 +13,14 @@ export default function HighlightCard({ onPress }: HighlightCardProps) {
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <ThemedView style={[styles.card, { backgroundColor: colors.softGreenTheme }, Shadows.medium]} />
+      <ThemedView style={[styles.card, { backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.successGreen }, Shadows.medium]} />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: 100, 
+    width: 100,
     height: 100,
     borderRadius: Radii.md,
   },

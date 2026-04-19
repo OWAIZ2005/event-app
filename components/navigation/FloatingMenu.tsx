@@ -39,7 +39,7 @@ export default function FloatingMenu({ onMainPress }: FloatingMenuProps) {
     ]).start();
   };
 
-  const btnColor = { backgroundColor: colors.softGreenTheme };
+  const btnColor = { backgroundColor: colors.successGreen };
 
   return (
     <View style={styles.container}>
@@ -111,7 +111,7 @@ export default function FloatingMenu({ onMainPress }: FloatingMenuProps) {
       <TouchableOpacity
         style={[
           styles.fab,
-          { backgroundColor: "rgba(76, 175, 80, 0.95)" },
+          { backgroundColor: "#1CB944" },
           Shadows.strong,
         ]}
         onPress={onMainPress ? onMainPress : toggleMenu}

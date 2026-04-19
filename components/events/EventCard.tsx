@@ -31,7 +31,11 @@ export default function EventCard({
       <ThemedView
         style={[
           styles.card,
-          { backgroundColor: colors.cardGreenBg },
+          {
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: colors.successGreen,
+          },
           Shadows.light,
         ]}
       >
@@ -46,7 +50,7 @@ export default function EventCard({
         </ThemedText>
         {showAdminAction ? (
           <TouchableOpacity
-            style={[styles.btn, { backgroundColor: colors.softGreenTheme }]}
+            style={[styles.btn, { backgroundColor: colors.successGreen }]}
             onPress={onAdminActionPress}
             activeOpacity={0.8}
           >
@@ -56,7 +60,7 @@ export default function EventCard({
           </TouchableOpacity>
         ) : (
           <ThemedView
-            style={[styles.btn, { backgroundColor: colors.softGreenTheme }]}
+            style={[styles.btn, { backgroundColor: colors.successGreen }]}
           />
         )}
       </ThemedView>

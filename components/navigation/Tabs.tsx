@@ -20,7 +20,7 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
         onPress={() => setActiveTab("events")}
         style={[
           styles.tab, 
-          { backgroundColor: activeTab === "events" ? colors.primary : colors.inactiveBtn }
+          { backgroundColor: activeTab === "events" ? colors.successGreen : colors.inactiveBtn }
         ]}
         activeOpacity={0.7}
       >
@@ -33,7 +33,7 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
         onPress={() => setActiveTab("my")}
         style={[
           styles.tab, 
-          { backgroundColor: activeTab === "my" ? colors.primary : colors.inactiveBtn }
+          { backgroundColor: activeTab === "my" ? colors.successGreen : colors.inactiveBtn }
         ]}
         activeOpacity={0.7}
       >

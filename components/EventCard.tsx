@@ -1,5 +1,4 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const EventCard = ({ onPress }) => {
   return (
@@ -11,7 +10,7 @@ const EventCard = ({ onPress }) => {
         <View style={styles.details}>
           <Text style={styles.eventName}>EVENT NAME</Text>
           <Text style={styles.organizer}>Organizer</Text>
-          <Text style={styles.date}>Date &amp; Time</Text>
+          <Text style={styles.date}>Date & Time</Text>
           <Text style={styles.venue}>Venue</Text>
         </View>
       </View>

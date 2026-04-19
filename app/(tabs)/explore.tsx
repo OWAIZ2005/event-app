@@ -1,112 +1,185 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SlideInRight,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
-export default function TabTwoScreen() {
+import EventCard from "@/components/events/EventCard";
+import HighlightCard from "@/components/events/HighlightCard";
+import FloatingMenu from "@/components/navigation/FloatingMenu";
+import Header from "@/components/navigation/Header";
+import Tabs from "@/components/navigation/Tabs";
+
+import { ThemedText } from "@/components/themed-text";
+import { Colors, Spacing, Radii } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+
+export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState("events");
+  const [myTab, setMyTab] = useState("remind");
+
+  const colorScheme = useColorScheme();
+  const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
+
+  const { width } = useWindowDimensions();
+
+  // slider width = half of container (with padding adjustment)
+  const sliderWidth = (width - 32) / 2;
+
+  const slider = useSharedValue(0);
+
+  const handleInnerTab = (tab: string) => {
+    setMyTab(tab);
+    slider.value = withTiming(tab === "remind" ? 0 : sliderWidth, {
+      duration: 250,
+    });
+  };
+
+  const sliderStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: slider.value }],
+  }));
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <>
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
+        <Header />
+
+        {/* TOP TABS */}
+        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+        {/* ================= EVENTS ================= */}
+        {activeTab === "events" && (
+          <Animated.View entering={FadeIn.duration(300)} exiting={FadeOut}>
+            <View style={styles.row}>
+              <HighlightCard />
+              <HighlightCard />
+              <HighlightCard />
+            </View>
+
+            <View style={styles.titleRow}>
+              <ThemedText style={styles.title}>
+                Events Coming Up
+              </ThemedText>
+              <ThemedText style={[styles.filter, { backgroundColor: colors.inactiveBtn }]}>Filter</ThemedText>
+            </View>
+
+            <EventCard title="Tech Conference 2026" date="Aug 14" location="San Francisco" />
+            <EventCard title="Startup Meetup" date="Sep 2" location="New York" />
+            <EventCard title="Design Workshop" date="Sep 15" location="Remote" />
+          </Animated.View>
+        )}
+
+        {/* ================= MY EVENTS ================= */}
+        {activeTab === "my" && (
+          <Animated.View entering={SlideInRight.duration(300)}>
+            
+            {/* SEGMENT CONTROL */}
+            <View style={[styles.segmentWrapper, { backgroundColor: colors.inactiveBtn }]}>
+              <Animated.View
+                style={[styles.slider, sliderStyle, { width: sliderWidth, backgroundColor: colors.primary }]}
+              />
+
+              <TouchableOpacity
+                style={styles.segmentBtn}
+                onPress={() => handleInnerTab("remind")}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.segmentText, { color: myTab === "remind" ? "#FFF" : colors.text }]}>
+                  Remind Me
+                </ThemedText>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.segmentBtn}
+                onPress={() => handleInnerTab("registered")}
+                activeOpacity={0.8}
+              >
+                <ThemedText style={[styles.segmentText, { color: myTab === "registered" ? "#FFF" : colors.text }]}>
+                  Registered
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+
+            {/* CONTENT */}
+            {myTab === "remind" && (
+              <Animated.View entering={FadeIn.duration(250)}>
+                <EventCard title="UX Research Sync" date="Tomorrow" location="Zoom" />
+                <EventCard title="Investors Dinner" date="Friday" location="Downtown" />
+              </Animated.View>
+            )}
+
+            {myTab === "registered" && (
+              <Animated.View entering={FadeIn.duration(250)}>
+                <EventCard title="Hackathon 2026" date="Oct 20-22" location="London" />
+                <EventCard title="DevRel Conference" date="Nov 5" location="Berlin" />
+                <EventCard title="AI Summit" date="Dec 10" location="Remote" />
+              </Animated.View>
+            )}
+          </Animated.View>
+        )}
+      </ScrollView>
+
+      <FloatingMenu />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    padding: Spacing.md,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: Spacing.lg,
+  },
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.sm,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  filter: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: Radii.sm,
+  },
+  /* SEGMENT CONTROL */
+  segmentWrapper: {
+    flexDirection: "row",
+    borderRadius: Radii.md,
+    overflow: "hidden",
+    marginVertical: Spacing.md,
+    position: "relative",
+  },
+  segmentBtn: {
+    flex: 1,
+    paddingVertical: Spacing.sm,
+    alignItems: "center",
+    zIndex: 1,
+  },
+  segmentText: {
+    fontWeight: "600",
+  },
+  slider: {
+    position: "absolute",
+    height: "100%",
+    borderRadius: Radii.md,
   },
 });

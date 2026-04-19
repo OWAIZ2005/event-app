@@ -9,22 +9,43 @@ import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
-
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Login */}
+        <Stack.Screen name="login" />
+
+        {/* Admin Profile */}
+        <Stack.Screen name="admin-login" />
+
+        {/* Signup */}
+        <Stack.Screen name="signup" />
+
+        {/* Student Profile — swipe back to dashboard */}
+        <Stack.Screen
+          name="student_profile"
+          options={{ gestureEnabled: true }}
+        />
+
+        {/* admin profile */}
+        <Stack.Screen name="admin-dashboard" />
+
+        {/* Edit Event */}
+        <Stack.Screen name="edit-event" />
+
+        {/* Main tabs (dashboard, explore, my-events) */}
+        <Stack.Screen name="(tabs)" />
+
+        {/* Modal */}
         <Stack.Screen
           name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
+          options={{ presentation: "modal", headerShown: true, title: "Modal" }}
         />
+
+        <Stack.Screen name="event_info" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

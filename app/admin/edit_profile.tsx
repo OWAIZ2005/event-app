@@ -1,9 +1,9 @@
 import { Radii, Shadows, Spacing } from "@/constants/theme";
-import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -21,27 +21,13 @@ const GREEN_SOFT = "#1C2E20";
 const SUBTEXT = "#666666";
 const TEXT = "#F5F5F5";
 
-export default function LoginScreen() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [usernameFocused, setUsernameFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
-
-  const router = useRouter();
-
-  const handleLogin = () => {
-    const user = username.trim();
-    const pass = password.trim();
-    if (user === "IEEECS" && pass === "IEEECS123") {
-      router.replace("/admin/admin_dashboard" as any);
-      return;
-    }
-    router.replace("/(tabs)");
-  };
-
-  const handleSignUp = () => {
-    router.push("/signup");
-  };
+export default function AdminProfileScreen() {
+  const [name, setName] = useState("");
+  const [department, setDepartment] = useState("");
+  const [email, setEmail] = useState("");
+  const [nameFocused, setNameFocused] = useState(false);
+  const [deptFocused, setDeptFocused] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -49,105 +35,107 @@ export default function LoginScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.flex}
       >
-        <View style={styles.flex}>
-          {/* Top glow blob */}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.glowTop} pointerEvents="none" />
 
           <View style={styles.content}>
-            {/* Heading */}
             <View style={styles.headingBlock}>
-              <Text style={styles.headingSmall}>Welcome back</Text>
-              <Text style={styles.headingBig}>Sign in.</Text>
+              <Text style={styles.headingSmall}>Admin settings</Text>
+              <Text style={styles.headingBig}>Edit profile.</Text>
             </View>
 
-            {/* Username */}
-            <Text style={styles.label}>USERNAME</Text>
+            <Text style={styles.label}>NAME</Text>
             <View
               style={[
                 styles.inputWrap,
-                { borderColor: usernameFocused ? GREEN : BORDER },
+                { borderColor: nameFocused ? GREEN : BORDER },
               ]}
             >
               <TextInput
                 style={styles.input}
-                placeholder="Enter username"
+                placeholder="Enter name"
                 placeholderTextColor={SUBTEXT}
-                value={username}
-                onChangeText={setUsername}
-                onFocus={() => setUsernameFocused(true)}
-                onBlur={() => setUsernameFocused(false)}
-                autoCapitalize="none"
+                value={name}
+                onChangeText={setName}
+                onFocus={() => setNameFocused(true)}
+                onBlur={() => setNameFocused(false)}
                 maxLength={50}
               />
             </View>
 
-            {/* Password */}
-            <Text style={styles.label}>PASSWORD</Text>
+            <Text style={styles.label}>DEPARTMENT</Text>
             <View
               style={[
                 styles.inputWrap,
-                { borderColor: passwordFocused ? GREEN : BORDER },
+                { borderColor: deptFocused ? GREEN : BORDER },
               ]}
             >
               <TextInput
                 style={styles.input}
-                placeholder="Enter password"
+                placeholder="Enter department"
                 placeholderTextColor={SUBTEXT}
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-                onFocus={() => setPasswordFocused(true)}
-                onBlur={() => setPasswordFocused(false)}
+                value={department}
+                onChangeText={setDepartment}
+                onFocus={() => setDeptFocused(true)}
+                onBlur={() => setDeptFocused(false)}
+                maxLength={50}
+              />
+            </View>
+
+            <Text style={styles.label}>EMAIL ID</Text>
+            <View
+              style={[
+                styles.inputWrap,
+                { borderColor: emailFocused ? GREEN : BORDER },
+              ]}
+            >
+              <TextInput
+                style={styles.input}
+                placeholder="Enter email"
+                placeholderTextColor={SUBTEXT}
+                value={email}
+                onChangeText={setEmail}
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}
+                keyboardType="email-address"
+                autoCapitalize="none"
                 maxLength={100}
               />
             </View>
 
-            {/* Forgot */}
-            <TouchableOpacity style={styles.forgotRow} activeOpacity={0.7}>
-              <Text style={styles.forgotText}>Forgot password?</Text>
-            </TouchableOpacity>
-
-            {/* Login */}
-            <TouchableOpacity
-              style={styles.loginBtn}
-              onPress={handleLogin}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.loginBtnText}>Login</Text>
+            <TouchableOpacity style={styles.actionBtn} activeOpacity={0.85}>
+              <Text style={styles.actionBtnText}>Save Profile</Text>
               <View style={styles.arrowBadge}>
-                <Text style={styles.arrowText}>→</Text>
+                <Text style={styles.arrowText}>{">"}</Text>
               </View>
             </TouchableOpacity>
 
-            {/* Divider */}
             <View style={styles.dividerRow}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>or</Text>
               <View style={styles.dividerLine} />
             </View>
 
-            {/* Sign up */}
-            <TouchableOpacity
-              style={styles.signupBtn}
-              onPress={handleSignUp}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.signupText}>Create an account</Text>
+            <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.8}>
+              <Text style={styles.secondaryText}>Change password</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: BLACK,
-  },
+  safe: { flex: 1, backgroundColor: BLACK },
   flex: { flex: 1 },
-
+  scrollContent: {
+    flexGrow: 1,
+  },
   glowTop: {
     position: "absolute",
     top: -120,
@@ -156,16 +144,15 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
     borderRadius: 150,
-    backgroundColor: "#1CB944",
+    backgroundColor: GREEN,
     opacity: 0.08,
   },
-
   content: {
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.xxl,
   },
-
   headingBlock: {
     marginBottom: Spacing.xxl,
   },
@@ -181,10 +168,9 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: "800",
     color: TEXT,
-    letterSpacing: -1.5,
+    letterSpacing: 0,
     lineHeight: 52,
   },
-
   label: {
     fontSize: 10,
     fontWeight: "700",
@@ -207,31 +193,20 @@ const styles = StyleSheet.create({
     color: TEXT,
     height: "100%",
   },
-
-  forgotRow: {
-    alignSelf: "flex-end",
-    marginTop: -Spacing.sm,
-    marginBottom: Spacing.xl,
-  },
-  forgotText: {
-    fontSize: 13,
-    color: GREEN_DIM,
-    fontWeight: "500",
-  },
-
-  loginBtn: {
+  actionBtn: {
     height: 56,
     backgroundColor: GREEN,
     borderRadius: Radii.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: Spacing.sm,
     marginBottom: Spacing.lg,
     ...Shadows.medium,
     shadowColor: GREEN,
     shadowOpacity: 0.35,
   },
-  loginBtnText: {
+  actionBtnText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "800",
@@ -252,7 +227,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
   },
-
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -268,8 +242,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: SUBTEXT,
   },
-
-  signupBtn: {
+  secondaryBtn: {
     height: 52,
     backgroundColor: GREEN_SOFT,
     borderRadius: Radii.md,
@@ -278,7 +251,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  signupText: {
+  secondaryText: {
     fontSize: 15,
     fontWeight: "600",
     color: GREEN_DIM,

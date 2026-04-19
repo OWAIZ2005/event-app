@@ -1,4 +1,4 @@
-import { Radii, Shadows, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
@@ -182,9 +182,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "800",
     color: TEXT,
+    letterSpacing: 0.5,
   },
   profileCircle: {
     width: 38,
@@ -212,16 +213,18 @@ const styles = StyleSheet.create({
     marginHorizontal: Spacing.lg,
     marginTop: 12,
     backgroundColor: GREEN,
-    borderRadius: Radii.md,
+    borderRadius: 10,
     padding: Spacing.lg,
     marginBottom: Spacing.md,
-    ...Shadows.medium,
-    shadowColor: GREEN,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
   },
   eventName: {
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: "900",
     color: "#fff",
     marginBottom: 6,
     letterSpacing: -0.3,
@@ -241,7 +244,7 @@ const styles = StyleSheet.create({
   detailsCard: {
     marginHorizontal: Spacing.lg,
     backgroundColor: SURFACE,
-    borderRadius: Radii.md,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: BORDER,
     paddingVertical: 4,
@@ -257,7 +260,7 @@ const styles = StyleSheet.create({
   iconBox: {
     width: 36,
     height: 36,
-    borderRadius: Radii.sm,
+    borderRadius: 8,
     backgroundColor: "rgba(28,185,68,0.1)",
     justifyContent: "center",
     alignItems: "center",
@@ -266,8 +269,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   detailLabel: {
-    fontSize: 10,
-    fontWeight: "700",
+    fontSize: 11,
+    fontWeight: "800",
     color: SUBTEXT,
     letterSpacing: 2,
     textTransform: "uppercase",
@@ -275,7 +278,7 @@ const styles = StyleSheet.create({
   },
   detailValue: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "700",
     color: TEXT,
   },
   divider: {
@@ -288,14 +291,14 @@ const styles = StyleSheet.create({
   descCard: {
     marginHorizontal: Spacing.lg,
     backgroundColor: SURFACE,
-    borderRadius: Radii.md,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: BORDER,
     padding: Spacing.lg,
   },
   descTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "800",
     color: TEXT,
     marginBottom: Spacing.sm,
   },
@@ -303,7 +306,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22,
     color: SUBTEXT,
-    fontWeight: "400",
+    fontWeight: "500",
   },
 
   // Bottom
@@ -319,36 +322,44 @@ const styles = StyleSheet.create({
   remindBtn: {
     flex: 1,
     height: 52,
-    borderRadius: Radii.md,
-    borderWidth: 1,
+    borderRadius: 10,
+    borderWidth: 2,
     borderColor: "#2E5C34",
     backgroundColor: GREEN_SOFT,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 3,
   },
   remindText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "700",
     color: GREEN_DIM,
+    letterSpacing: 0.3,
   },
   registerBtn: {
     flex: 2,
     height: 52,
-    borderRadius: Radii.md,
+    borderRadius: 10,
     backgroundColor: GREEN,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
-    ...Shadows.medium,
-    shadowColor: GREEN,
-    shadowOpacity: 0.35,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
   },
   registerText: {
     color: "#fff",
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: 16,
+    fontWeight: "900",
     letterSpacing: 0.5,
   },
   arrowBadge: {
@@ -363,7 +374,7 @@ const styles = StyleSheet.create({
   },
   arrowText: {
     color: "#fff",
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "900",
   },
 });

@@ -61,7 +61,6 @@ export default function AdminDashboard() {
         {/* My Events */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>My Events</Text>
-          <Text style={styles.sectionSub}>Swipe to delete</Text>
         </View>
 
         {Array.from({ length: 5 }).map((_, index) => (

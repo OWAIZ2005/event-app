@@ -9,13 +9,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
-import { useColorScheme } from "../../hooks/use-color-scheme";
+import { Radii, Shadows, Spacing } from "../../constants/theme";
+
+const BLACK = "#0A0A0A";
+const SURFACE = "#141414";
+const BORDER = "#222222";
+const GREEN = "#1CB944";
+const GREEN_DIM = "#4CAF50";
+const GREEN_SOFT = "#1C2E20";
+const GREEN_SOFT_BORDER = "#2E5C34";
+const SUBTEXT = "#666666";
+const TEXT = "#F5F5F5";
 
 export default function EditEvent() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
 
   const [eventName, setEventName] = useState("Tech Conference 2026");
   const [organizer, setOrganizer] = useState("John Doe");
@@ -29,101 +36,77 @@ export default function EditEvent() {
   );
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      {/* Header handled by _layout.tsx */}
+    <View style={styles.screen}>
+      {/* Glow blob — same as Login */}
+      <View style={styles.glowTop} pointerEvents="none" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View
-          style={[
-            styles.darkGreenBox,
-            { backgroundColor: colors.tint },
-            Shadows.light,
-          ]}
-        >
+        {/* Green box — Event Name + Organizer */}
+        <View style={styles.greenBox}>
           <View style={styles.fieldSection}>
-            <Text style={styles.whiteLabel}>Event Name</Text>
+            <Text style={styles.greenLabel}>Event Name</Text>
             <TextInput
-              style={[styles.whiteInput, { color: "#FFFFFF" }]}
-              placeholderTextColor="rgba(255,255,255,0.7)"
+              style={styles.greenInput}
+              placeholderTextColor="rgba(255,255,255,0.4)"
               value={eventName}
               onChangeText={setEventName}
             />
           </View>
           <View style={styles.fieldSection}>
-            <Text style={styles.whiteLabel}>Organizer Name</Text>
+            <Text style={styles.greenLabel}>Organizer Name</Text>
             <TextInput
-              style={[styles.whiteInput, { color: "#FFFFFF" }]}
-              placeholderTextColor="rgba(255,255,255,0.7)"
+              style={styles.greenInput}
+              placeholderTextColor="rgba(255,255,255,0.4)"
               value={organizer}
               onChangeText={setOrganizer}
             />
           </View>
         </View>
 
-        <View
-          style={[
-            styles.whiteBox,
-            { backgroundColor: "#FFFFFF" },
-            Shadows.light,
-          ]}
-        >
+        {/* Dark surface box — detail rows */}
+        <View style={styles.darkBox}>
           <EditableRow
             icon="calendar"
             label="Date & Time"
             value={dateTime}
             onChangeText={setDateTime}
-            colors={colors}
           />
           <EditableRow
             icon="map-marker"
             label="Venue"
             value={venue}
             onChangeText={setVenue}
-            colors={colors}
           />
           <EditableRow
             icon="users"
             label="Total Participants"
             value={participants}
             onChangeText={setParticipants}
-            colors={colors}
           />
           <EditableRow
             icon="money"
             label="Payment Amount"
             value={payment}
             onChangeText={setPayment}
-            colors={colors}
           />
           <EditableRow
             icon="link"
             label="Event Link"
             value={eventLink}
             onChangeText={setEventLink}
-            colors={colors}
             isLast
           />
         </View>
 
-        <View
-          style={[
-            styles.whiteBox,
-            { backgroundColor: "#FFFFFF" },
-            Shadows.light,
-          ]}
-        >
-          <Text style={[styles.aboutTitle, { color: colors.text }]}>
-            About the Event
-          </Text>
+        {/* About box */}
+        <View style={styles.darkBox}>
+          <Text style={styles.aboutTitle}>About the Event</Text>
           <TextInput
-            style={[
-              styles.descriptionInput,
-              { color: colors.text, borderColor: colors.border },
-            ]}
-            placeholderTextColor={colors.subText}
+            style={styles.descriptionInput}
+            placeholderTextColor={SUBTEXT}
             multiline
             numberOfLines={4}
             value={description}
@@ -135,19 +118,13 @@ export default function EditEvent() {
         <View style={{ height: 80 }} />
       </ScrollView>
 
-      <View
-        style={[
-          styles.stickyButtonContainer,
-          { backgroundColor: colors.background, borderTopColor: colors.border },
-        ]}
-      >
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            { backgroundColor: colors.softGreenTheme },
-          ]}
-        >
-          <Text style={styles.saveButtonText}>Save</Text>
+      {/* Sticky Save button — mirrors Login button */}
+      <View style={styles.saveBar}>
+        <TouchableOpacity style={styles.saveBtn} activeOpacity={0.85}>
+          <Text style={styles.saveBtnText}>Save</Text>
+          <View style={styles.arrowBadge}>
+            <Text style={styles.arrowText}>→</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -159,14 +136,12 @@ function EditableRow({
   label,
   value,
   onChangeText,
-  colors,
   isLast,
 }: {
   icon: string;
   label: string;
   value: string;
   onChangeText: (text: string) => void;
-  colors: typeof Colors.light;
   isLast?: boolean;
 }) {
   return (
@@ -175,111 +150,180 @@ function EditableRow({
         <FontAwesome
           name={icon as any}
           size={18}
-          color={colors.tint}
+          color={GREEN}
           style={styles.rowIcon}
         />
         <View style={styles.rowContent}>
-          <Text style={[styles.rowLabel, { color: colors.subText }]}>
-            {label}
-          </Text>
+          <Text style={styles.rowLabel}>{label}</Text>
           <TextInput
-            style={[styles.rowInput, { color: colors.text }]}
-            placeholderTextColor={colors.subText}
+            style={styles.rowInput}
+            placeholderTextColor={SUBTEXT}
             value={value}
             onChangeText={onChangeText}
           />
         </View>
       </View>
-      {!isLast && (
-        <View style={[styles.rowDivider, { backgroundColor: colors.border }]} />
-      )}
+      {!isLast && <View style={styles.rowDivider} />}
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1 },
+  screen: {
+    flex: 1,
+    backgroundColor: BLACK,
+  },
+
+  glowTop: {
+    position: "absolute",
+    top: -120,
+    left: "50%",
+    marginLeft: -150,
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: GREEN,
+    opacity: 0.08,
+  },
+
   scrollContent: {
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.md,
     paddingBottom: Spacing.lg,
+    gap: Spacing.md,
   },
-  darkGreenBox: {
+
+  // Green soft card (top box)
+  greenBox: {
+    backgroundColor: GREEN_SOFT,
+    borderWidth: 1,
+    borderColor: GREEN_SOFT_BORDER,
     borderRadius: Radii.lg,
     padding: Spacing.md,
-    marginBottom: Spacing.md,
   },
-  fieldSection: { marginVertical: 12 },
-  whiteLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "#FFFFFF",
-    marginBottom: 6,
+  fieldSection: {
+    marginVertical: 10,
+  },
+  greenLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: GREEN_DIM,
+    letterSpacing: 2,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
-    opacity: 0.9,
+    marginBottom: 6,
   },
-  whiteInput: {
+  greenInput: {
     fontSize: 16,
     fontWeight: "600",
-    paddingVertical: 4,
-    paddingHorizontal: 0,
+    color: TEXT,
+    borderBottomWidth: 1,
+    borderBottomColor: GREEN_SOFT_BORDER,
+    paddingBottom: 6,
   },
-  whiteBox: {
+
+  // Dark surface card
+  darkBox: {
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
     borderRadius: Radii.lg,
-    marginBottom: Spacing.md,
     overflow: "hidden",
   },
+
   editableRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     paddingHorizontal: Spacing.md,
     paddingVertical: 14,
   },
-  rowIcon: { marginRight: 12, marginTop: 4 },
-  rowContent: { flex: 1 },
+  rowIcon: {
+    marginRight: 12,
+    marginTop: 4,
+  },
+  rowContent: {
+    flex: 1,
+  },
   rowLabel: {
-    fontSize: 11,
-    fontWeight: "500",
-    marginBottom: 4,
+    fontSize: 10,
+    fontWeight: "700",
+    color: SUBTEXT,
+    letterSpacing: 2,
     textTransform: "uppercase",
-    letterSpacing: 0.4,
+    marginBottom: 4,
   },
   rowInput: {
     fontSize: 15,
     fontWeight: "600",
-    paddingVertical: 4,
-    paddingHorizontal: 0,
+    color: TEXT,
   },
-  rowDivider: { height: 1, marginHorizontal: Spacing.md },
+  rowDivider: {
+    height: 1,
+    backgroundColor: BORDER,
+    marginHorizontal: Spacing.md,
+  },
+
   aboutTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 10,
+    fontSize: 10,
+    fontWeight: "700",
+    color: SUBTEXT,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.md,
+    marginBottom: 10,
   },
   descriptionInput: {
     fontSize: 14,
     lineHeight: 20,
-    borderRadius: Radii.md,
+    color: TEXT,
     borderWidth: 1,
+    borderColor: BORDER,
+    borderRadius: Radii.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     margin: Spacing.md,
     minHeight: 100,
+    backgroundColor: BLACK,
   },
-  stickyButtonContainer: {
+
+  // Save bar — mirrors Login button
+  saveBar: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
     borderTopWidth: 1,
+    borderTopColor: BORDER,
+    backgroundColor: BLACK,
   },
-  saveButton: {
-    paddingVertical: 14,
+  saveBtn: {
+    height: 56,
+    backgroundColor: GREEN,
     borderRadius: Radii.md,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    ...Shadows.light,
+    ...Shadows.medium,
+    shadowColor: GREEN,
+    shadowOpacity: 0.35,
   },
-  saveButtonText: { color: "#FFFFFF", fontSize: 16, fontWeight: "600" },
+  saveBtnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  arrowBadge: {
+    position: "absolute",
+    right: Spacing.md,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  arrowText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
 });

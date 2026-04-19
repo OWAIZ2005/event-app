@@ -9,39 +9,38 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import { Colors, Radii, Shadows } from "../../constants/theme";
-import { useColorScheme } from "../../hooks/use-color-scheme";
+import { Radii, Shadows } from "../../constants/theme";
+
+const BLACK = "#0A0A0A";
+const SURFACE = "#141414";
+const BORDER = "#222222";
+const GREEN = "#1CB944";
+const GREEN_DIM = "#4CAF50";
+const GREEN_SOFT = "#1C2E20";
+const GREEN_SOFT_BORDER = "#2E5C34";
+const TEXT = "#F5F5F5";
+const SUBTEXT = "#666666";
 
 export default function AdminLayout() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
   const [menuVisible, setMenuVisible] = useState(false);
+
+  const handleSignOut = () => {
+    setMenuVisible(false);
+    router.replace("/login" as any);
+  };
 
   return (
     <>
       {/* ── Shared Header ── */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: colors.background,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.headerSide}
-        >
-          <FontAwesome name="arrow-left" size={20} color={colors.text} />
-        </TouchableOpacity>
+      <View style={styles.header}>
+        <View style={styles.headerSide} />
 
         <View style={styles.headerCenter} />
 
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
-          style={[styles.circle, { backgroundColor: colors.softGreenTheme }]}
+          style={styles.circle}
         />
       </View>
 
@@ -59,13 +58,7 @@ export default function AdminLayout() {
           <View style={styles.modalOverlay} />
         </TouchableWithoutFeedback>
 
-        <View
-          style={[
-            styles.menuCard,
-            { backgroundColor: colors.background },
-            Shadows.strong,
-          ]}
-        >
+        <View style={[styles.menuCard, Shadows.strong]}>
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => {
@@ -76,20 +69,13 @@ export default function AdminLayout() {
             <FontAwesome
               name="info-circle"
               size={16}
-              color={colors.text}
+              color={TEXT}
               style={styles.menuIcon}
             />
-            <Text style={[styles.menuText, { color: colors.text }]}>
-              About Club
-            </Text>
+            <Text style={styles.menuText}>About Club</Text>
           </TouchableOpacity>
 
-          <View
-            style={[
-              styles.menuDivider,
-              { backgroundColor: colors.text + "18" },
-            ]}
-          />
+          <View style={styles.menuDivider} />
 
           <TouchableOpacity
             style={styles.menuItem}
@@ -101,12 +87,23 @@ export default function AdminLayout() {
             <FontAwesome
               name="user-circle"
               size={16}
-              color={colors.text}
+              color={TEXT}
               style={styles.menuIcon}
             />
-            <Text style={[styles.menuText, { color: colors.text }]}>
-              Edit Profile
-            </Text>
+            <Text style={styles.menuText}>Edit Profile</Text>
+          </TouchableOpacity>
+
+          <View style={styles.menuDivider} />
+
+          {/* Sign Out */}
+          <TouchableOpacity style={styles.menuItem} onPress={handleSignOut}>
+            <FontAwesome
+              name="sign-out"
+              size={16}
+              color="#E05252"
+              style={styles.menuIcon}
+            />
+            <Text style={styles.signOutText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -123,6 +120,8 @@ const styles = StyleSheet.create({
     paddingTop: 52,
     paddingBottom: 12,
     borderBottomWidth: 1,
+    backgroundColor: BLACK,
+    borderBottomColor: BORDER,
   },
   headerSide: {
     width: 36,
@@ -134,18 +133,24 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
+    backgroundColor: GREEN_SOFT,
+    borderWidth: 1,
+    borderColor: GREEN_SOFT_BORDER,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.15)",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   menuCard: {
     position: "absolute",
     top: 110,
     right: 16,
     borderRadius: Radii.lg,
-    minWidth: 170,
+    minWidth: 180,
     overflow: "hidden",
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
   },
   menuItem: {
     flexDirection: "row",
@@ -155,14 +160,21 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     marginRight: 10,
-    opacity: 0.75,
+    opacity: 0.85,
   },
   menuText: {
     fontSize: 15,
     fontWeight: "600",
+    color: TEXT,
   },
   menuDivider: {
     height: 1,
+    backgroundColor: BORDER,
     marginHorizontal: 12,
+  },
+  signOutText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#E05252",
   },
 });

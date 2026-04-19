@@ -1,3 +1,4 @@
+import { Radii, Shadows, Spacing } from "@/constants/theme";
 import { useState } from "react";
 import {
     KeyboardAvoidingView,
@@ -10,150 +11,191 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Colors, Radii, Shadows, Spacing } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+const BLACK = "#0A0A0A";
+const SURFACE = "#141414";
+const BORDER = "#222222";
+const GREEN = "#1CB944";
+const GREEN_DIM = "#4CAF50";
+const SUBTEXT = "#666666";
+const TEXT = "#F5F5F5";
 
 export default function AdminProfileScreen() {
   const [name, setName] = useState("");
   const [department, setDepartment] = useState("");
   const [email, setEmail] = useState("");
-  const colorScheme = useColorScheme();
-
-  const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
+  const [nameFocused, setNameFocused] = useState(false);
+  const [deptFocused, setDeptFocused] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
 
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
+        style={styles.flex}
       >
-        <ThemedView style={styles.container}>
+        <View style={styles.flex}>
+          <View style={styles.glowTop} pointerEvents="none" />
+
           <View style={styles.content}>
-            {/* ADMIN PROFILE Title */}
-            <ThemedText
-              type="title"
-              style={[styles.profileTitle, { color: colors.primary }]}
+            <Text style={styles.headingSmall}>Settings</Text>
+            <Text style={styles.headingBig}>Admin Profile</Text>
+
+            <Text style={styles.label}>NAME</Text>
+            <View
+              style={[
+                styles.inputWrap,
+                { borderColor: nameFocused ? GREEN : BORDER },
+              ]}
             >
-              ADMIN PROFILE
-            </ThemedText>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter name"
+                placeholderTextColor={SUBTEXT}
+                value={name}
+                onChangeText={setName}
+                onFocus={() => setNameFocused(true)}
+                onBlur={() => setNameFocused(false)}
+                maxLength={50}
+              />
+            </View>
 
-            {/* Name Input */}
-            <TextInput
+            <Text style={styles.label}>DEPARTMENT</Text>
+            <View
               style={[
-                styles.input,
-                {
-                  backgroundColor: colors.surface,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
+                styles.inputWrap,
+                { borderColor: deptFocused ? GREEN : BORDER },
               ]}
-              placeholder="Name"
-              placeholderTextColor={colors.subText}
-              value={name}
-              onChangeText={setName}
-              editable
-              maxLength={50}
-            />
-
-            {/* Department Input */}
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.surface,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              placeholder="Department"
-              placeholderTextColor={colors.subText}
-              value={department}
-              onChangeText={setDepartment}
-              maxLength={50}
-            />
-
-            {/* Email Input */}
-            <TextInput
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colors.surface,
-                  color: colors.text,
-                  borderColor: colors.border,
-                },
-              ]}
-              placeholder="Email ID"
-              placeholderTextColor={colors.subText}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              maxLength={100}
-            />
-
-            {/* Change Password Button */}
-            <TouchableOpacity
-              style={[
-                styles.actionButton,
-                { backgroundColor: colors.primary },
-                Shadows.medium,
-              ]}
-              activeOpacity={0.8}
             >
-              <Text style={styles.actionButtonText}>Change Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter department"
+                placeholderTextColor={SUBTEXT}
+                value={department}
+                onChangeText={setDepartment}
+                onFocus={() => setDeptFocused(true)}
+                onBlur={() => setDeptFocused(false)}
+                maxLength={50}
+              />
+            </View>
+
+            <Text style={styles.label}>EMAIL ID</Text>
+            <View
+              style={[
+                styles.inputWrap,
+                { borderColor: emailFocused ? GREEN : BORDER },
+              ]}
+            >
+              <TextInput
+                style={styles.input}
+                placeholder="Enter email"
+                placeholderTextColor={SUBTEXT}
+                value={email}
+                onChangeText={setEmail}
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                maxLength={100}
+              />
+            </View>
+
+            <TouchableOpacity style={styles.actionBtn} activeOpacity={0.85}>
+              <Text style={styles.actionBtnText}>Change Password</Text>
+              <View style={styles.arrowBadge}>
+                <Text style={styles.arrowText}>→</Text>
+              </View>
             </TouchableOpacity>
           </View>
-        </ThemedView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
+  safe: { flex: 1, backgroundColor: BLACK },
+  flex: { flex: 1 },
+  glowTop: {
+    position: "absolute",
+    top: -120,
+    left: "50%",
+    marginLeft: -150,
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: GREEN,
+    opacity: 0.08,
   },
   content: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
     paddingHorizontal: Spacing.xl,
-    width: "100%",
   },
-  profileTitle: {
+  headingSmall: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: GREEN_DIM,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    marginBottom: 6,
+  },
+  headingBig: {
     fontSize: 42,
-    fontWeight: "900",
+    fontWeight: "800",
+    color: TEXT,
+    letterSpacing: -1.5,
+    lineHeight: 48,
     marginBottom: Spacing.xxl,
-    fontStyle: "normal",
-    textAlign: "center",
-    letterSpacing: 1,
+  },
+  label: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: SUBTEXT,
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+  inputWrap: {
+    height: 54,
+    backgroundColor: SURFACE,
+    borderRadius: Radii.md,
+    borderWidth: 1,
+    paddingHorizontal: Spacing.md,
+    justifyContent: "center",
+    marginBottom: Spacing.lg,
   },
   input: {
-    width: "100%",
-    height: 55,
-    borderRadius: Radii.md,
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.lg,
-    fontSize: 17,
-    fontWeight: "600",
-    borderWidth: 1,
+    fontSize: 15,
+    fontWeight: "500",
+    color: TEXT,
+    height: "100%",
   },
-  actionButton: {
-    width: "100%",
-    height: 55,
+  actionBtn: {
+    height: 56,
+    backgroundColor: GREEN,
     borderRadius: Radii.md,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     marginTop: Spacing.lg,
+    ...Shadows.medium,
+    shadowColor: GREEN,
+    shadowOpacity: 0.35,
   },
-  actionButtonText: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "#FFFFFF",
+  actionBtnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: 0.5,
   },
+  arrowBadge: {
+    position: "absolute",
+    right: Spacing.md,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  arrowText: { color: "#fff", fontSize: 16, fontWeight: "700" },
 });

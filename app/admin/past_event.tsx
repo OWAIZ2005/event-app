@@ -7,117 +7,88 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { Colors, Radii, Shadows, Spacing } from "../../constants/theme";
-import { useColorScheme } from "../../hooks/use-color-scheme";
+import { Radii, Spacing } from "../../constants/theme";
+
+const BLACK = "#0A0A0A";
+const SURFACE = "#141414";
+const BORDER = "#222222";
+const GREEN = "#1CB944";
+const GREEN_DIM = "#4CAF50";
+const GREEN_SOFT = "#1C2E20";
+const GREEN_SOFT_BORDER = "#2E5C34";
+const SUBTEXT = "#666666";
+const TEXT = "#F5F5F5";
 
 export default function PastEventScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
   const { width } = useWindowDimensions();
-
   const bannerHeight = width * 0.55;
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
-      {/* Header handled by _layout.tsx */}
+    <View style={styles.screen}>
+      <View style={styles.glowTop} pointerEvents="none" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Banner */}
-        <View
-          style={[
-            styles.banner,
-            { height: bannerHeight, backgroundColor: colors.cardGreenBg },
-            Shadows.light,
-          ]}
-        >
+        <View style={[styles.banner, { height: bannerHeight }]}>
           <FontAwesome
             name="image"
             size={40}
-            color={colors.text}
-            style={{ opacity: 0.2 }}
+            color={TEXT}
+            style={{ opacity: 0.15 }}
           />
         </View>
 
-        {/* Dark Green Header */}
-        <View
-          style={[
-            styles.darkGreenBox,
-            { backgroundColor: colors.tint },
-            Shadows.light,
-          ]}
-        >
+        {/* Green soft header box */}
+        <View style={styles.greenBox}>
           <View style={styles.fieldSection}>
-            <Text style={styles.whiteLabel}>Event Name</Text>
-            <Text style={styles.whiteValue}>Tech Conference 2026</Text>
+            <Text style={styles.greenLabel}>Event Name</Text>
+            <Text style={styles.greenValue}>Tech Conference 2026</Text>
           </View>
           <View style={styles.dividerLight} />
           <View style={styles.fieldSection}>
-            <Text style={styles.whiteLabel}>Organizer</Text>
-            <Text style={styles.whiteValue}>John Doe</Text>
+            <Text style={styles.greenLabel}>Organizer</Text>
+            <Text style={styles.greenValue}>John Doe</Text>
           </View>
         </View>
 
-        {/* Info Card */}
-        <View
-          style={[
-            styles.whiteBox,
-            { backgroundColor: colors.cardGreenBg },
-            Shadows.light,
-          ]}
-        >
+        {/* Info card */}
+        <View style={styles.darkBox}>
           <InfoRow
             icon="calendar"
             label="Date & Time"
             value="May 15, 2026 • 2:00 PM"
-            colors={colors}
           />
-          <RowDivider color={colors.border} />
+          <RowDivider />
           <InfoRow
             icon="map-marker"
             label="Venue"
             value="Grand Convention Hall, NYC"
-            colors={colors}
           />
-          <RowDivider color={colors.border} />
-          <InfoRow
-            icon="users"
-            label="Total Participants"
-            value="250"
-            colors={colors}
-          />
-          <RowDivider color={colors.border} />
+          <RowDivider />
+          <InfoRow icon="users" label="Total Participants" value="250" />
+          <RowDivider />
           <InfoRow
             icon="money"
             label="Payment Amount"
             value="$50.00 per ticket"
-            colors={colors}
           />
-          <RowDivider color={colors.border} />
+          <RowDivider />
           <InfoRow
             icon="link"
             label="Event Link"
             value="www.techconf2026.com"
-            colors={colors}
             isLast
           />
         </View>
 
-        {/* About Card */}
-        <View
-          style={[
-            styles.whiteBox,
-            { backgroundColor: colors.cardGreenBg },
-            Shadows.light,
-          ]}
-        >
-          <Text style={[styles.aboutTitle, { color: colors.text }]}>
-            About the Event
-          </Text>
-          <Text style={[styles.aboutBody, { color: colors.text }]}>
+        {/* About card */}
+        <View style={styles.darkBox}>
+          <Text style={styles.aboutTitle}>About the Event</Text>
+          <Text style={styles.aboutBody}>
             Join us for an exciting tech conference where industry leaders share
             insights on emerging technologies, AI, and digital transformation.
           </Text>
@@ -133,13 +104,11 @@ function InfoRow({
   icon,
   label,
   value,
-  colors,
   isLast,
 }: {
   icon: string;
   label: string;
   value: string;
-  colors: typeof Colors.light;
   isLast?: boolean;
 }) {
   return (
@@ -147,61 +116,77 @@ function InfoRow({
       <FontAwesome
         name={icon as any}
         size={17}
-        color={colors.tint}
+        color={GREEN}
         style={styles.rowIcon}
       />
       <View style={styles.rowContent}>
-        <Text style={[styles.rowLabel, { color: colors.subText }]}>
-          {label}
-        </Text>
-        <Text style={[styles.rowValue, { color: colors.text }]}>{value}</Text>
+        <Text style={styles.rowLabel}>{label}</Text>
+        <Text style={styles.rowValue}>{value}</Text>
       </View>
     </View>
   );
 }
 
-function RowDivider({ color }: { color: string }) {
-  return <View style={[styles.rowDivider, { backgroundColor: color }]} />;
+function RowDivider() {
+  return <View style={styles.rowDivider} />;
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1 },
+  screen: { flex: 1, backgroundColor: BLACK },
+  glowTop: {
+    position: "absolute",
+    top: -120,
+    left: "50%",
+    marginLeft: -150,
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: GREEN,
+    opacity: 0.07,
+  },
   scrollContent: {
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.md,
     paddingBottom: Spacing.lg,
+    gap: Spacing.md,
   },
   banner: {
     width: "100%",
     borderRadius: Radii.lg,
-    marginBottom: Spacing.md,
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
     alignItems: "center",
     justifyContent: "center",
   },
-  darkGreenBox: {
+  greenBox: {
+    backgroundColor: GREEN_SOFT,
+    borderWidth: 1,
+    borderColor: GREEN_SOFT_BORDER,
     borderRadius: Radii.lg,
     padding: Spacing.md,
-    marginBottom: Spacing.md,
   },
   fieldSection: { marginVertical: 8 },
-  whiteLabel: {
-    fontSize: 11,
-    fontWeight: "500",
-    color: "#FFFFFF",
-    marginBottom: 4,
+  greenLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: GREEN_DIM,
+    letterSpacing: 2,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
+    marginBottom: 4,
     opacity: 0.8,
   },
-  whiteValue: { fontSize: 17, fontWeight: "700", color: "#FFFFFF" },
+  greenValue: { fontSize: 17, fontWeight: "700", color: TEXT },
   dividerLight: {
     height: 1,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: GREEN_SOFT_BORDER,
     marginVertical: 4,
   },
-  whiteBox: {
+  darkBox: {
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: BORDER,
     borderRadius: Radii.lg,
-    marginBottom: Spacing.md,
     overflow: "hidden",
   },
   infoRow: {
@@ -213,17 +198,25 @@ const styles = StyleSheet.create({
   rowIcon: { marginRight: 12, marginTop: 3 },
   rowContent: { flex: 1 },
   rowLabel: {
-    fontSize: 11,
-    fontWeight: "500",
+    fontSize: 10,
+    fontWeight: "700",
+    color: SUBTEXT,
+    letterSpacing: 2,
     textTransform: "uppercase",
-    letterSpacing: 0.4,
     marginBottom: 3,
   },
-  rowValue: { fontSize: 15, fontWeight: "600" },
-  rowDivider: { height: 1, marginHorizontal: Spacing.md },
+  rowValue: { fontSize: 15, fontWeight: "600", color: TEXT },
+  rowDivider: {
+    height: 1,
+    backgroundColor: BORDER,
+    marginHorizontal: Spacing.md,
+  },
   aboutTitle: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 10,
+    fontWeight: "700",
+    color: SUBTEXT,
+    letterSpacing: 2,
+    textTransform: "uppercase",
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.md,
     marginBottom: 8,
@@ -231,8 +224,9 @@ const styles = StyleSheet.create({
   aboutBody: {
     fontSize: 14,
     lineHeight: 22,
+    color: TEXT,
+    opacity: 0.75,
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.md,
-    opacity: 0.8,
   },
 });

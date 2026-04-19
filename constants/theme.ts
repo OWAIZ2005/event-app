@@ -1,47 +1,47 @@
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
-const tintColorLight = '#2E7D32'; // Deep, sophisticated green
-const tintColorDark = '#A5D6A7'; 
-const successGreen = '#1CB944'; // Keeping original success for buttons
-const lightGreenBg = '#E8F5E9'; // Much cleaner, subtle light green
-const primaryGreen = '#4CAF50'; 
-const cardGreenBg = '#C8E6C9';
-const softGreenTheme = '#81C784';
+const tintColorLight = "#2E7D32"; // Deep, sophisticated green
+const tintColorDark = "#A5D6A7";
+const successGreen = "#1CB944"; // Keeping original success for buttons
+const lightGreenBg = "#E8F5E9"; // Much cleaner, subtle light green
+const primaryGreen = "#4CAF50";
+const cardGreenBg = "#C8E6C9";
+const softGreenTheme = "#81C784";
 
 export const Colors = {
   light: {
-    text: '#1C2826', // Deep forest/charcoal tint
-    subText: '#687076',
-    background: '#F9FAFB', // Cool light gray
-    surface: '#FFFFFF', // Card background
-    border: '#E0E0E0',
+    text: "#1C2826", // Deep forest/charcoal tint
+    subText: "#687076",
+    background: "#F9FAFB", // Cool light gray
+    surface: "#FFFFFF", // Card background
+    border: "#E0E0E0",
     primary: primaryGreen,
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: "#687076",
+    tabIconDefault: "#687076",
     tabIconSelected: tintColorLight,
     successGreen,
     lightGreenBg,
     cardGreenBg,
     softGreenTheme,
-    inactiveBtn: '#E2E8F0',
+    inactiveBtn: "#E2E8F0",
   },
   dark: {
-    text: '#ECEDEE',
-    subText: '#A1A1AA',
-    background: '#121212',
-    surface: '#1E1E1E',
-    border: '#333333',
+    text: "#ECEDEE",
+    subText: "#A1A1AA",
+    background: "#121212",
+    surface: "#1E1E1E",
+    border: "#333333",
     primary: tintColorDark,
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: "#9BA1A6",
+    tabIconDefault: "#9BA1A6",
     tabIconSelected: tintColorDark,
-    successGreen: '#4ADE80',
-    lightGreenBg: '#1C2E20', // Dark subtle green
-    cardGreenBg: '#2E4C34',
-    softGreenTheme: '#66BB6A',
-    inactiveBtn: '#27272A',
+    successGreen: "#4ADE80",
+    lightGreenBg: "#1C2E20", // Dark subtle green
+    cardGreenBg: "#2E4C34",
+    softGreenTheme: "#66BB6A",
+    inactiveBtn: "#27272A",
   },
 };
 
@@ -88,21 +88,22 @@ export const Shadows = {
 
 export const Fonts = Platform.select({
   ios: {
-    sans: 'system-ui',
-    serif: 'ui-serif',
-    rounded: 'ui-rounded',
-    mono: 'ui-monospace',
+    sans: "system-ui",
+    serif: "ui-serif",
+    rounded: "ui-rounded",
+    mono: "ui-monospace",
   },
   default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
+    sans: "normal",
+    serif: "serif",
+    rounded: "normal",
+    mono: "monospace",
   },
   web: {
     sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
+    rounded:
+      "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });

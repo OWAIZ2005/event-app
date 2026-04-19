@@ -1,250 +1,351 @@
+import { Radii, Shadows, Spacing } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-import { Colors, Spacing, Radii, Shadows } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+const BLACK = "#0A0A0A";
+const SURFACE = "#141414";
+const BORDER = "#222222";
+const GREEN = "#1CB944";
+const GREEN_DIM = "#4CAF50";
+const GREEN_SOFT = "#1C2E20";
+const SUBTEXT = "#666666";
+const TEXT = "#F5F5F5";
 
 export default function SignUpScreen() {
   const [username, setUsername] = useState("");
   const [department, setDepartment] = useState("");
   const [yearOfStudy, setYearOfStudy] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"club" | "student">("club");
+  const [role, setRole] = useState<"club" | "student">("student");
 
-  const colorScheme = useColorScheme();
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+
   const router = useRouter();
 
-  const colors = colorScheme === "dark" ? Colors.dark : Colors.light;
-
-  const handleSignIn = () => {
-  if (role === "club") {
-    router.replace("/admin-dashboard");
-  } else {
-    router.replace("/(tabs)");
-  }
+  const handleSignUp = () => {
+    if (role === "club") {
+      router.replace("/admin/admin_dashboard" as any);
+    } else {
+      router.replace("/(tabs)");
+    }
   };
 
+  const inputStyle = (field: string) => ({
+    ...styles.inputWrap,
+    borderColor: focusedField === field ? GREEN : BORDER,
+  });
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <ThemedView style={styles.container}>
-        <View style={styles.content}>
+    <SafeAreaView style={styles.safe}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.flex}
+      >
+        {/* Glow blob */}
+        <View style={styles.glowTop} pointerEvents="none" />
 
-          {/* Avatar */}
-          <View style={[styles.avatarCircle, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            {/* Placeholder avatar icon */}
-            
-          </View>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.content}>
+            {/* Heading */}
+            <View style={styles.headingBlock}>
+              <Text style={styles.headingSmall}>Join us</Text>
+              <Text style={styles.headingBig}>Create{"\n"}account.</Text>
+            </View>
 
-          {/* Username Input */}
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                color: colors.text,
-                borderColor: colors.border,
-              },
-            ]}
-            placeholder="Username"
-            placeholderTextColor={colors.subText}
-            value={username}
-            onChangeText={setUsername}
-            maxLength={50}
-          />
+            {/* Username */}
+            <Text style={styles.label}>USERNAME</Text>
+            <View style={inputStyle("username")}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter username"
+                placeholderTextColor={SUBTEXT}
+                value={username}
+                onChangeText={setUsername}
+                onFocus={() => setFocusedField("username")}
+                onBlur={() => setFocusedField(null)}
+                autoCapitalize="none"
+                maxLength={50}
+              />
+            </View>
 
-          {/* Department Input */}
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                color: colors.text,
-                borderColor: colors.border,
-              },
-            ]}
-            placeholder="Department"
-            placeholderTextColor={colors.subText}
-            value={department}
-            onChangeText={setDepartment}
-            maxLength={100}
-          />
+            {/* Department */}
+            <Text style={styles.label}>DEPARTMENT</Text>
+            <View style={inputStyle("department")}>
+              <TextInput
+                style={styles.input}
+                placeholder="e.g. Computer Science"
+                placeholderTextColor={SUBTEXT}
+                value={department}
+                onChangeText={setDepartment}
+                onFocus={() => setFocusedField("department")}
+                onBlur={() => setFocusedField(null)}
+                maxLength={100}
+              />
+            </View>
 
-          {/* Year of Study Input */}
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                color: colors.text,
-                borderColor: colors.border,
-              },
-            ]}
-            placeholder="Year of Study"
-            placeholderTextColor={colors.subText}
-            value={yearOfStudy}
-            onChangeText={setYearOfStudy}
-            keyboardType="numeric"
-            maxLength={1}
-          />
+            {/* Year of Study */}
+            <Text style={styles.label}>YEAR OF STUDY</Text>
+            <View style={inputStyle("year")}>
+              <TextInput
+                style={styles.input}
+                placeholder="1 – 4"
+                placeholderTextColor={SUBTEXT}
+                value={yearOfStudy}
+                onChangeText={setYearOfStudy}
+                onFocus={() => setFocusedField("year")}
+                onBlur={() => setFocusedField(null)}
+                keyboardType="numeric"
+                maxLength={1}
+              />
+            </View>
 
-          {/* New Password Input */}
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: colors.surface,
-                color: colors.text,
-                borderColor: colors.border,
-              },
-            ]}
-            placeholder="New Password"
-            placeholderTextColor={colors.subText}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            maxLength={100}
-          />
+            {/* Password */}
+            <Text style={styles.label}>PASSWORD</Text>
+            <View style={inputStyle("password")}>
+              <TextInput
+                style={styles.input}
+                placeholder="Create a password"
+                placeholderTextColor={SUBTEXT}
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+                onFocus={() => setFocusedField("password")}
+                onBlur={() => setFocusedField(null)}
+                maxLength={100}
+              />
+            </View>
 
-          {/* Role Toggle: Club / Student */}
-          <View style={styles.roleRow}>
-            <TouchableOpacity
-              style={[
-                styles.roleButton,
-                role === "club"
-                  ? { backgroundColor: colors.primary }
-                  : { backgroundColor: "transparent", borderColor: colors.primary, borderWidth: 2 },
-              ]}
-              onPress={() => setRole("club")}
-              activeOpacity={0.8}
-            >
-              <Text
+            {/* Role toggle */}
+            <Text style={styles.label}>I AM A</Text>
+            <View style={styles.roleRow}>
+              <TouchableOpacity
                 style={[
-                  styles.roleButtonText,
-                  { color: role === "club" ? "#fff" : colors.primary },
+                  styles.roleBtn,
+                  role === "student"
+                    ? styles.roleBtnActive
+                    : styles.roleBtnInactive,
                 ]}
+                onPress={() => setRole("student")}
+                activeOpacity={0.8}
               >
-                Club
-              </Text>
+                <Text
+                  style={[
+                    styles.roleBtnText,
+                    { color: role === "student" ? "#fff" : GREEN_DIM },
+                  ]}
+                >
+                  Student
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.roleBtn,
+                  role === "club"
+                    ? styles.roleBtnActive
+                    : styles.roleBtnInactive,
+                ]}
+                onPress={() => setRole("club")}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[
+                    styles.roleBtnText,
+                    { color: role === "club" ? "#fff" : GREEN_DIM },
+                  ]}
+                >
+                  Club
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Sign up button */}
+            <TouchableOpacity
+              style={styles.signupBtn}
+              onPress={handleSignUp}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.signupBtnText}>Create Account</Text>
+              <View style={styles.arrowBadge}>
+                <Text style={styles.arrowText}>→</Text>
+              </View>
             </TouchableOpacity>
 
+            {/* Back to login */}
             <TouchableOpacity
-              style={[
-                styles.roleButton,
-                role === "student"
-                  ? { backgroundColor: colors.primary }
-                  : { backgroundColor: "transparent", borderColor: colors.primary, borderWidth: 2 },
-              ]}
-              onPress={() => setRole("student")}
-              activeOpacity={0.8}
+              style={styles.loginRow}
+              onPress={() => router.back()}
+              activeOpacity={0.7}
             >
-              <Text
-                style={[
-                  styles.roleButtonText,
-                  { color: role === "student" ? "#fff" : colors.primary },
-                ]}
-              >
-                Student
+              <Text style={styles.loginRowText}>
+                Already have an account?{" "}
+                <Text style={{ color: GREEN_DIM }}>Sign in</Text>
               </Text>
             </TouchableOpacity>
           </View>
-
-          {/* SIGN IN Button */}
-          <TouchableOpacity
-            style={[
-              styles.signInButton,
-              { backgroundColor: colors.primary },
-              Shadows.medium,
-            ]}
-            onPress={handleSignIn}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.signInButtonText}>SIGN IN</Text>
-          </TouchableOpacity>
-
-        </View>
-      </ThemedView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: {
     flex: 1,
+    backgroundColor: BLACK,
   },
-  content: {
-    flex: 1,
+  flex: { flex: 1 },
+
+  glowTop: {
+    position: "absolute",
+    top: -120,
+    left: "50%",
+    marginLeft: -150,
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: GREEN,
+    opacity: 0.07,
+  },
+
+  scroll: {
+    flexGrow: 1,
     justifyContent: "center",
-    alignItems: "center",
+  },
+
+  content: {
     paddingHorizontal: Spacing.xl,
-    width: "100%",
+    paddingVertical: Spacing.xxl,
   },
-  avatarCircle: {
-  width: 186,
-  height: 183,
-  borderRadius: 93,   // half of width for a circle
-  borderWidth: 1.5,
-  justifyContent: "center",
-  alignItems: "center",
-  marginBottom: Spacing.xxl,
-  overflow: "hidden",
-},
-  
-  input: {
-    width: "100%",
-    height: 55,
+
+  headingBlock: {
+    marginBottom: Spacing.xxl,
+  },
+  headingSmall: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: GREEN_DIM,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    marginBottom: 6,
+  },
+  headingBig: {
+    fontSize: 48,
+    fontWeight: "800",
+    color: TEXT,
+    letterSpacing: -1.5,
+    lineHeight: 52,
+  },
+
+  label: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: SUBTEXT,
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+  inputWrap: {
+    height: 54,
+    backgroundColor: SURFACE,
     borderRadius: Radii.md,
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.lg,
-    fontSize: 17,
-    fontWeight: "600",
     borderWidth: 1,
+    paddingHorizontal: Spacing.md,
+    justifyContent: "center",
+    marginBottom: Spacing.lg,
   },
+  input: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: TEXT,
+    height: "100%",
+  },
+
   roleRow: {
     flexDirection: "row",
-    width: "100%",
     gap: Spacing.md,
-    marginBottom: Spacing.lg,
-    marginTop: Spacing.sm,
+    marginBottom: Spacing.xl,
   },
-  roleButton: {
+  roleBtn: {
     flex: 1,
     height: 50,
     borderRadius: Radii.md,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
   },
-  roleButtonText: {
-    fontSize: 16,
+  roleBtnActive: {
+    backgroundColor: GREEN,
+    borderColor: GREEN,
+    ...Shadows.medium,
+    shadowColor: GREEN,
+    shadowOpacity: 0.3,
+  },
+  roleBtnInactive: {
+    backgroundColor: GREEN_SOFT,
+    borderColor: "#2E5C34",
+  },
+  roleBtnText: {
+    fontSize: 15,
     fontWeight: "700",
     letterSpacing: 0.3,
   },
-  signInButton: {
-    width: "75%",
-    height: 55,
+
+  signupBtn: {
+    height: 56,
+    backgroundColor: GREEN,
     borderRadius: Radii.md,
-    justifyContent: "center",
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: Spacing.xl,
+    justifyContent: "center",
+    marginBottom: Spacing.lg,
+    ...Shadows.medium,
+    shadowColor: GREEN,
+    shadowOpacity: 0.35,
   },
-  signInButtonText: {
+  signupBtnText: {
     color: "#fff",
-    fontSize: 19,
-    fontWeight: "900",
+    fontSize: 16,
+    fontWeight: "800",
     letterSpacing: 0.5,
+  },
+  arrowBadge: {
+    position: "absolute",
+    right: Spacing.md,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  arrowText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+
+  loginRow: {
+    alignItems: "center",
+    paddingVertical: Spacing.sm,
+  },
+  loginRowText: {
+    fontSize: 14,
+    color: SUBTEXT,
+    fontWeight: "500",
   },
 });

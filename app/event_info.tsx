@@ -1,4 +1,3 @@
-import { Spacing } from "@/constants/theme";
 import { Radii, Shadows, Spacing } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";

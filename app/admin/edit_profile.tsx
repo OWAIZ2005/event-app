@@ -1,13 +1,14 @@
 import { Radii, Shadows, Spacing } from "@/constants/theme";
 import { useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -16,6 +17,7 @@ const SURFACE = "#141414";
 const BORDER = "#222222";
 const GREEN = "#1CB944";
 const GREEN_DIM = "#4CAF50";
+const GREEN_SOFT = "#1C2E20";
 const SUBTEXT = "#666666";
 const TEXT = "#F5F5F5";
 
@@ -33,12 +35,18 @@ export default function AdminProfileScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.flex}
       >
-        <View style={styles.flex}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.glowTop} pointerEvents="none" />
 
           <View style={styles.content}>
-            <Text style={styles.headingSmall}>Settings</Text>
-            <Text style={styles.headingBig}>Admin Profile</Text>
+            <View style={styles.headingBlock}>
+              <Text style={styles.headingSmall}>Admin settings</Text>
+              <Text style={styles.headingBig}>Edit profile.</Text>
+            </View>
 
             <Text style={styles.label}>NAME</Text>
             <View
@@ -100,13 +108,23 @@ export default function AdminProfileScreen() {
             </View>
 
             <TouchableOpacity style={styles.actionBtn} activeOpacity={0.85}>
-              <Text style={styles.actionBtnText}>Change Password</Text>
+              <Text style={styles.actionBtnText}>Save Profile</Text>
               <View style={styles.arrowBadge}>
-                <Text style={styles.arrowText}>→</Text>
+                <Text style={styles.arrowText}>{">"}</Text>
               </View>
             </TouchableOpacity>
+
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.8}>
+              <Text style={styles.secondaryText}>Change password</Text>
+            </TouchableOpacity>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -115,6 +133,9 @@ export default function AdminProfileScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BLACK },
   flex: { flex: 1 },
+  scrollContent: {
+    flexGrow: 1,
+  },
   glowTop: {
     position: "absolute",
     top: -120,
@@ -130,6 +151,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.xxl,
+  },
+  headingBlock: {
+    marginBottom: Spacing.xxl,
   },
   headingSmall: {
     fontSize: 13,
@@ -140,12 +165,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   headingBig: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: "800",
     color: TEXT,
-    letterSpacing: -1.5,
-    lineHeight: 48,
-    marginBottom: Spacing.xxl,
+    letterSpacing: 0,
+    lineHeight: 52,
   },
   label: {
     fontSize: 10,
@@ -176,7 +200,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: Spacing.lg,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.lg,
     ...Shadows.medium,
     shadowColor: GREEN,
     shadowOpacity: 0.35,
@@ -197,5 +222,38 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  arrowText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  arrowText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: BORDER,
+  },
+  dividerText: {
+    fontSize: 13,
+    color: SUBTEXT,
+  },
+  secondaryBtn: {
+    height: 52,
+    backgroundColor: GREEN_SOFT,
+    borderRadius: Radii.md,
+    borderWidth: 1,
+    borderColor: "#2E5C34",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  secondaryText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: GREEN_DIM,
+  },
 });

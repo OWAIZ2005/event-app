@@ -83,8 +83,12 @@ export default function AdminDashboard() {
         <View style={{ height: 90 }} />
       </ScrollView>
 
-      {/* FAB */}
-      <TouchableOpacity style={styles.fab} activeOpacity={0.85}>
+      {/* FAB — navigates to the Create Event page */}
+      <TouchableOpacity
+        style={styles.fab}
+        activeOpacity={0.85}
+        onPress={() => router.push("/admin/create_event" as any)}
+      >
         <FontAwesome name="plus" size={22} color="#fff" />
       </TouchableOpacity>
     </View>

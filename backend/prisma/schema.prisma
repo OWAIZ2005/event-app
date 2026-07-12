@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model University {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  domain    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users     User[]
+  clubs     Club[]
+}
+
+model User {
+  id           String      @id @default(uuid())
+  name         String
+  email        String      @unique
+  password     String
+  role         String      @default("STUDENT") // STUDENT, CLUB_ADMIN, SUPER_ADMIN
+  refreshToken String?
+  profilePictureUrl String?
+  department   String?
+  yearOfStudy  Int?
+  universityId String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  university   University? @relation(fields: [universityId], references: [id])
+  clubAdmin    Club?       // If user is CLUB_ADMIN
+  favorites    Favorite[]
+  notifications Notification[]
+
+  @@index([email])
+}
+
+model Club {
+  id           String     @id @default(uuid())
+  name         String
+  description  String?
+  logoUrl      String?
+  socialLinks  Json?      // Store { instagram: "", website: "" } etc.
+  adminId      String     @unique
+  universityId String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  admin        User       @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  university   University? @relation(fields: [universityId], references: [id])
+  events       Event[]
+}
+
+model Event {
+  id                   String   @id @default(uuid())
+  title                String
+  description          String
+  clubId               String
+  category             String
+  date                 DateTime // Includes both date and startTime
+  endTime              DateTime?
+  venue                String
+  registrationDeadline DateTime?
+  registrationUrl      String?
+  contactPerson        String?
+  posterUrl            String?
+  tags                 String[]
+  isPublished          Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  // Future proofing fields
+  capacity             Int?
+  waitlistCount        Int      @default(0)
+  speakerDetails       Json?    // Array of speaker objects
+  sponsorDetails       Json?    // Array of sponsor objects
+  prizePool            String?
+
+  club                 Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  favorites            Favorite[]
+  analytics            EventAnalytics?
+
+  @@index([date])
+  @@index([clubId])
+  @@index([category])
+  @@index([isPublished])
+}
+
+model EventAnalytics {
+  id                 String   @id @default(uuid())
+  eventId            String   @unique
+  viewCount          Int      @default(0)
+  favoriteCount      Int      @default(0)
+  shareCount         Int      @default(0)
+  registerClickCount Int      @default(0)
+  updatedAt          DateTime @updatedAt
+
+  event              Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([userId, eventId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // NEW_EVENT, EVENT_UPDATED, REMINDER
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+}

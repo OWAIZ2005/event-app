@@ -25,6 +25,36 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Backend Setup (Required for all developers)
+
+Our backend runs on Node.js, Prisma, and PostgreSQL. To set up the backend on your local machine, follow these exact steps:
+
+1. **Install Dependencies**
+   Navigate to the backend directory and install packages:
+   ```bash
+   cd backend
+   npm install
+   ```
+
+2. **Configure Environment Variables**
+   Copy the example environment file and fill in your local Postgres and Cloudinary credentials:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Database Setup**
+   Ensure you have PostgreSQL installed and running locally on port 5432.
+   Then, run the Prisma migrations to create the database and generate the client (Type `y` when prompted to create the `event_app` database):
+   ```bash
+   npx prisma migrate dev
+   ```
+
+4. **Start the Development Server**
+   ```bash
+   npm run dev
+   ```
+   The backend will start running on `http://localhost:5000`.
+
 ## Get a fresh project
 
 When you're ready, run:

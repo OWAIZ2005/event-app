@@ -1,6 +1,16 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  GestureResponderEvent,
+} from "react-native";
 
-const EventCard = ({ onPress }) => {
+interface EventCardProps {
+  onPress: (event: GestureResponderEvent) => void;
+}
+
+const EventCard = ({ onPress }: EventCardProps) => {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
       <View style={styles.card}>

@@ -1,6 +1,7 @@
 import { Radii, Shadows, Spacing } from "@/constants/theme";
+import { EventItem, useEventState } from "@/context/EventStateContext";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ScrollView,
   StyleSheet,
@@ -41,6 +42,31 @@ function DetailRow({ icon, label, value }: DetailRowProps) {
 
 export default function EventInfoScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{
+    id?: string;
+    title?: string;
+    date?: string;
+    location?: string;
+    organizer?: string;
+    description?: string;
+  }>();
+
+  const { toggleReminder, registerEvent, isReminder, isRegistered } =
+    useEventState();
+
+  const currentEvent: EventItem = {
+    id: params.id || "tech-conf-2026",
+    title: params.title || "Tech Conference 2026",
+    date: params.date || "Aug 14, 2026 · 10:00 AM",
+    location: params.location || "Moscone Center, San Francisco",
+    organizer: params.organizer || "Tech Club",
+    description:
+      params.description ||
+      "Join us for an incredible tech conference featuring industry leaders, workshops, and networking opportunities. This event brings together the brightest minds in technology for a full day of learning and collaboration.",
+  };
+
+  const inReminder = isReminder(currentEvent.id);
+  const inRegistered = isRegistered(currentEvent.id);
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -80,14 +106,16 @@ export default function EventInfoScreen() {
 
         {/* Name Card */}
         <View style={styles.nameCard}>
-          <Text style={styles.eventName}>Tech Conference 2026</Text>
+          <Text style={styles.eventName}>{currentEvent.title}</Text>
           <View style={styles.organizerRow}>
             <Ionicons
               name="person-circle-outline"
               size={15}
               color="#ffffffcc"
             />
-            <Text style={styles.organizerText}>Organized by: Tech Club</Text>
+            <Text style={styles.organizerText}>
+              Organized by: {currentEvent.organizer}
+            </Text>
           </View>
         </View>
 
@@ -96,13 +124,13 @@ export default function EventInfoScreen() {
           <DetailRow
             icon="calendar-outline"
             label="Date & Time"
-            value="Aug 14, 2026 · 10:00 AM"
+            value={currentEvent.date}
           />
           <View style={styles.divider} />
           <DetailRow
             icon="location-outline"
             label="Venue"
-            value="Moscone Center, San Francisco"
+            value={currentEvent.location}
           />
           <View style={styles.divider} />
           <DetailRow
@@ -117,12 +145,7 @@ export default function EventInfoScreen() {
         {/* Description Card */}
         <View style={styles.descCard}>
           <Text style={styles.descTitle}>About this Event</Text>
-          <Text style={styles.descText}>
-            Join us for an incredible tech conference featuring industry
-            leaders, workshops, and networking opportunities. This event brings
-            together the brightest minds in technology for a full day of
-            learning and collaboration.
-          </Text>
+          <Text style={styles.descText}>{currentEvent.description}</Text>
         </View>
 
         <View style={{ height: Spacing.xl }} />
@@ -130,15 +153,54 @@ export default function EventInfoScreen() {
 
       {/* Bottom Buttons */}
       <View style={styles.bottomRow}>
-        <TouchableOpacity style={styles.remindBtn} activeOpacity={0.8}>
-          <Ionicons name="notifications-outline" size={17} color={GREEN_DIM} />
-          <Text style={styles.remindText}>Remind Me</Text>
+        <TouchableOpacity
+          style={[
+            styles.remindBtn,
+            inReminder && styles.remindBtnActive,
+            inRegistered && styles.remindBtnInactive,
+          ]}
+          activeOpacity={inRegistered ? 1 : 0.8}
+          onPress={() => {
+            if (!inRegistered) {
+              toggleReminder(currentEvent);
+            }
+          }}
+          disabled={inRegistered}
+        >
+          <Ionicons
+            name={inReminder ? "notifications" : "notifications-outline"}
+            size={17}
+            color={inReminder ? "#FFF" : inRegistered ? SUBTEXT : GREEN_DIM}
+          />
+          <Text
+            style={[
+              styles.remindText,
+              inReminder && styles.remindTextActive,
+              inRegistered && styles.remindTextInactive,
+            ]}
+          >
+            {inReminder ? "Reminded" : "Remind Me"}
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.registerBtn} activeOpacity={0.85}>
-          <Text style={styles.registerText}>Register Now</Text>
+        <TouchableOpacity
+          style={[
+            styles.registerBtn,
+            inRegistered && styles.registerBtnDisabled,
+          ]}
+          activeOpacity={inRegistered ? 1 : 0.85}
+          onPress={() => {
+            if (!inRegistered) {
+              registerEvent(currentEvent);
+            }
+          }}
+          disabled={inRegistered}
+        >
+          <Text style={styles.registerText}>
+            {inRegistered ? "Registered" : "Register Now"}
+          </Text>
           <View style={styles.arrowBadge}>
-            <Text style={styles.arrowText}>→</Text>
+            <Text style={styles.arrowText}>{inRegistered ? "✓" : "→"}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -336,11 +398,26 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 3,
   },
+  remindBtnActive: {
+    backgroundColor: GREEN,
+    borderColor: GREEN,
+  },
+  remindBtnInactive: {
+    opacity: 0.5,
+    borderColor: BORDER,
+    backgroundColor: SURFACE,
+  },
   remindText: {
     fontSize: 15,
     fontWeight: "700",
     color: GREEN_DIM,
     letterSpacing: 0.3,
+  },
+  remindTextActive: {
+    color: "#FFF",
+  },
+  remindTextInactive: {
+    color: SUBTEXT,
   },
   registerBtn: {
     flex: 2,
@@ -355,6 +432,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 8,
+  },
+  registerBtnDisabled: {
+    backgroundColor: "#16652B",
+    opacity: 0.85,
   },
   registerText: {
     color: "#fff",
@@ -378,3 +459,4 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
 });
+

@@ -1,6 +1,8 @@
 import { Radii, Shadows, Spacing } from "@/constants/theme";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { apiFetch, setTokens, getAccessToken } from "@/utils/apiClient";
+import { jwtDecode } from "jwt-decode";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -27,16 +29,127 @@ export default function LoginScreen() {
   const [usernameFocused, setUsernameFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
   const router = useRouter();
 
-  const handleLogin = () => {
-    const user = username.trim();
+  // useEffect(() => {
+  //   const checkSession = async () => {
+  //     const token = await getAccessToken();
+  //     if (token) {
+  //       try {
+  //         const userPayload: any = jwtDecode(token);
+  //         if (userPayload.role === "CLUB_ADMIN" || userPayload.role === "SUPER_ADMIN") {
+  //           router.replace("/admin/admin_dashboard" as any);
+  //         } else {
+  //           router.replace("/(tabs)");
+  //         }
+  //       } catch (e) {
+  //         // token decoding failed or expired, let user log in manually
+  //       }
+  //     }
+  //   };
+  //   checkSession();
+  // }, []);
+
+  // =========================================================================
+  // TEMPORARY FRONTEND LOGIN CONFIGURATION & HARDCODED USERS
+  // =========================================================================
+  // Set to true for temporary frontend-only login without backend API calls.
+  // Set to false to restore original backend API authentication.
+  const USE_TEMPORARY_FRONTEND_LOGIN = true;
+
+  // Temporary hardcoded user credentials and roles
+  const HARDCODED_USERS = [
+    {
+      id: "temp-student-101",
+      name: "Student User",
+      email: "user@gmail.com",
+      password: "user@123",
+      role: "STUDENT",
+      targetRoute: "/(tabs)" as const,
+    },
+    {
+      id: "temp-club-101",
+      name: "Club Admin",
+      email: "club@gmail.com",
+      password: "club123",
+      role: "CLUB_ADMIN",
+      targetRoute: "/admin/admin_dashboard" as any,
+    },
+  ];
+
+  const handleLogin = async () => {
+    const email = username.trim();
     const pass = password.trim();
-    if (user === "IEEECS" && pass === "IEEECS123") {
-      router.replace("/admin/admin_dashboard" as any);
+    
+    if (!email || !pass) {
+      setErrorMsg("Please enter both email and password.");
       return;
     }
-    router.replace("/(tabs)");
+
+    setIsLoading(true);
+    setErrorMsg("");
+
+    // =========================================================================
+    // TEMPORARY FRONTEND LOGIN LOGIC
+    // =========================================================================
+    if (USE_TEMPORARY_FRONTEND_LOGIN) {
+      setTimeout(async () => {
+        const matchedUser = HARDCODED_USERS.find(
+          (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === pass
+        );
+
+        if (matchedUser) {
+          // Temporary frontend user object structure
+          const tempUserObj = {
+            id: matchedUser.id,
+            name: matchedUser.name,
+            email: matchedUser.email,
+            role: matchedUser.role,
+          };
+
+          // Store mock tokens to maintain session consistency without backend
+          await setTokens(
+            `temp-access-token-${matchedUser.role}`,
+            `temp-refresh-token-${matchedUser.role}`
+          );
+
+          setIsLoading(false);
+
+          // Route to appropriate dashboard based on user role
+          router.replace(matchedUser.targetRoute);
+        } else {
+          setIsLoading(false);
+          setErrorMsg("Invalid email or password.");
+        }
+      }, 300);
+      return;
+    }
+
+    // =========================================================================
+    // BACKEND LOGIN LOGIC (Preserved untouched for re-enabling later)
+    // =========================================================================
+    try {
+      const data = await apiFetch("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password: pass }),
+      });
+
+      await setTokens(data.accessToken, data.refreshToken);
+      
+      const userPayload: any = jwtDecode(data.accessToken);
+      if (userPayload.role === "CLUB_ADMIN" || userPayload.role === "SUPER_ADMIN") {
+        router.replace("/admin/admin_dashboard" as any);
+      } else {
+        router.replace("/(tabs)");
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || "Invalid email or password");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignUp = () => {
@@ -60,8 +173,12 @@ export default function LoginScreen() {
               <Text style={styles.headingBig}>Sign in.</Text>
             </View>
 
-            {/* Username */}
-            <Text style={styles.label}>USERNAME</Text>
+            {errorMsg ? (
+              <Text style={{ color: "#E53935", marginBottom: Spacing.md, fontSize: 13, fontWeight: "600" }}>{errorMsg}</Text>
+            ) : null}
+
+            {/* Email */}
+            <Text style={styles.label}>EMAIL ADDRESS</Text>
             <View
               style={[
                 styles.inputWrap,
@@ -70,12 +187,13 @@ export default function LoginScreen() {
             >
               <TextInput
                 style={styles.input}
-                placeholder="Enter username"
+                placeholder="Enter your email"
                 placeholderTextColor={SUBTEXT}
                 value={username}
-                onChangeText={setUsername}
+                onChangeText={(text) => { setUsername(text); setErrorMsg(""); }}
                 onFocus={() => setUsernameFocused(true)}
                 onBlur={() => setUsernameFocused(false)}
+                keyboardType="email-address"
                 autoCapitalize="none"
                 maxLength={50}
               />
@@ -95,7 +213,7 @@ export default function LoginScreen() {
                 placeholderTextColor={SUBTEXT}
                 secureTextEntry
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(text) => { setPassword(text); setErrorMsg(""); }}
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
                 maxLength={100}
@@ -113,10 +231,12 @@ export default function LoginScreen() {
               onPress={handleLogin}
               activeOpacity={0.85}
             >
-              <Text style={styles.loginBtnText}>Login</Text>
-              <View style={styles.arrowBadge}>
-                <Text style={styles.arrowText}>→</Text>
-              </View>
+              <Text style={styles.loginBtnText}>{isLoading ? "Signing in..." : "Login"}</Text>
+              {!isLoading && (
+                <View style={styles.arrowBadge}>
+                  <Text style={styles.arrowText}>→</Text>
+                </View>
+              )}
             </TouchableOpacity>
 
             {/* Divider */}

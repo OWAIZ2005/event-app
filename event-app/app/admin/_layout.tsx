@@ -1,6 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
+import { clearTokens } from "../../utils/apiClient";
 import {
     Modal,
     StyleSheet,
@@ -25,8 +26,9 @@ export default function AdminLayout() {
   const router = useRouter();
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     setMenuVisible(false);
+    await clearTokens();
     router.replace("/login" as any);
   };
 

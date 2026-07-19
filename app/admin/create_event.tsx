@@ -1,6 +1,6 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
     KeyboardAvoidingView,
     Platform,
@@ -11,7 +11,12 @@ import {
     TouchableOpacity,
     useWindowDimensions,
     View,
+    Image,
+    ActivityIndicator,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { apiFetch, getAccessToken, API_BASE_URL } from "@/utils/apiClient";
+import { useClubEvents } from "@/context/ClubEventContext";
 
 // ── Theme tokens (mirrored from AdminDashboard) ──────────────────────────────
 const BLACK = "#0A0A0A";
@@ -34,20 +39,102 @@ const Shadows = {
 // ── Component ────────────────────────────────────────────────────────────────
 export default function CreateEvent() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ id?: string }>();
   const { width } = useWindowDimensions();
+  const { clubEvents, addClubEvent, updateClubEvent } = useClubEvents();
+
+  const existingEvent = params.id
+    ? clubEvents.find((evt) => evt.id === params.id)
+    : undefined;
+
+  const isEditMode = Boolean(params.id && existingEvent);
 
   // Dimensions that mirror AdminDashboard's card sizing
   const bannerHeight = width * 0.45;   // same as largeCardHeight
   const thumbSize   = width * 0.32;   // same as smallCardSize
 
-  const [title, setTitle]       = useState("");
-  const [date, setDate]         = useState("");
-  const [location, setLocation] = useState("");
-  const [details, setDetails]   = useState("");
+  const [title, setTitle]       = useState(existingEvent ? existingEvent.title : "");
+  const [date, setDate]         = useState(existingEvent ? existingEvent.date : "");
+  const [location, setLocation] = useState(existingEvent ? existingEvent.venue : "");
+  const [details, setDetails]   = useState(existingEvent ? existingEvent.description : "");
+  const [bannerImage, setBannerImage] = useState<string | null>(
+    existingEvent?.bannerImage || null
+  );
+  const [isCreating, setIsCreating] = useState(false);
 
-  const handleCreate = () => {
-    // TODO: wire up your actual create logic / API call here
-    router.back();
+  useEffect(() => {
+    if (existingEvent) {
+      setTitle(existingEvent.title);
+      setDate(existingEvent.date);
+      setLocation(existingEvent.venue);
+      setDetails(existingEvent.description);
+      setBannerImage(existingEvent.bannerImage || null);
+    }
+  }, [existingEvent]);
+
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Permission to access library is required!');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setBannerImage(result.assets[0].uri);
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!title.trim() || !location.trim() || !details.trim()) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      if (isEditMode && existingEvent) {
+        updateClubEvent({
+          ...existingEvent,
+          title: title.trim(),
+          date: date.trim() || existingEvent.date,
+          venue: location.trim(),
+          description: details.trim(),
+          bannerImage: bannerImage || null,
+        });
+        alert("Event updated successfully!");
+      } else {
+        addClubEvent({
+          title: title.trim(),
+          date:
+            date.trim() ||
+            new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+          venue: location.trim(),
+          description: details.trim(),
+          category: "General",
+          organizer: "Tech Club",
+          bannerImage: bannerImage || null,
+        });
+        alert("Event created successfully!");
+      }
+
+      router.back();
+    } catch (e: any) {
+      alert(e.message || "An error occurred");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -63,7 +150,9 @@ export default function CreateEvent() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <FontAwesome name="chevron-left" size={16} color={GREEN_DIM} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add New Event</Text>
+        <Text style={styles.headerTitle}>
+          {isEditMode ? "Edit Event" : "Add New Event"}
+        </Text>
         {/* spacer keeps title centred */}
         <View style={{ width: 36 }} />
       </View>
@@ -78,12 +167,16 @@ export default function CreateEvent() {
         </View>
 
         <View style={styles.cardBlock}>
-          <TouchableOpacity activeOpacity={0.75}>
+          <TouchableOpacity activeOpacity={0.75} onPress={pickImage}>
             <View style={[styles.largeCard, { height: bannerHeight }]}>
-              <View style={styles.uploadHint}>
-                <FontAwesome name="pencil-square-o" size={28} color={GREEN_DIM} />
-                <Text style={styles.uploadText}>Tap to add banner</Text>
-              </View>
+              {bannerImage ? (
+                <Image source={{ uri: bannerImage }} style={{ width: "100%", height: "100%", borderRadius: Radii.lg }} resizeMode="cover" />
+              ) : (
+                <View style={styles.uploadHint}>
+                  <FontAwesome name="pencil-square-o" size={28} color={GREEN_DIM} />
+                  <Text style={styles.uploadText}>Tap to add banner</Text>
+                </View>
+              )}
             </View>
           </TouchableOpacity>
         </View>
@@ -161,8 +254,13 @@ export default function CreateEvent() {
         style={styles.fab}
         activeOpacity={0.85}
         onPress={handleCreate}
+        disabled={isCreating}
       >
-        <FontAwesome name="check" size={22} color="#fff" />
+        {isCreating ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <FontAwesome name="check" size={22} color="#fff" />
+        )}
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

@@ -1,7 +1,7 @@
 import { Radii, Shadows, Spacing } from "@/constants/theme";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { apiFetch, setTokens } from "@/utils/apiClient";
+import { useState, useEffect } from "react";
+import { apiFetch, setTokens, getAccessToken } from "@/utils/apiClient";
 import { jwtDecode } from "jwt-decode";
 import {
   KeyboardAvoidingView,
@@ -34,6 +34,52 @@ export default function LoginScreen() {
 
   const router = useRouter();
 
+  // useEffect(() => {
+  //   const checkSession = async () => {
+  //     const token = await getAccessToken();
+  //     if (token) {
+  //       try {
+  //         const userPayload: any = jwtDecode(token);
+  //         if (userPayload.role === "CLUB_ADMIN" || userPayload.role === "SUPER_ADMIN") {
+  //           router.replace("/admin/admin_dashboard" as any);
+  //         } else {
+  //           router.replace("/(tabs)");
+  //         }
+  //       } catch (e) {
+  //         // token decoding failed or expired, let user log in manually
+  //       }
+  //     }
+  //   };
+  //   checkSession();
+  // }, []);
+
+  // =========================================================================
+  // TEMPORARY FRONTEND LOGIN CONFIGURATION & HARDCODED USERS
+  // =========================================================================
+  // Set to true for temporary frontend-only login without backend API calls.
+  // Set to false to restore original backend API authentication.
+  const USE_TEMPORARY_FRONTEND_LOGIN = true;
+
+  // Temporary hardcoded user credentials and roles
+  const HARDCODED_USERS = [
+    {
+      id: "temp-student-101",
+      name: "Student User",
+      email: "user@gmail.com",
+      password: "user@123",
+      role: "STUDENT",
+      targetRoute: "/(tabs)" as const,
+    },
+    {
+      id: "temp-club-101",
+      name: "Club Admin",
+      email: "club@gmail.com",
+      password: "club123",
+      role: "CLUB_ADMIN",
+      targetRoute: "/admin/admin_dashboard" as any,
+    },
+  ];
+
   const handleLogin = async () => {
     const email = username.trim();
     const pass = password.trim();
@@ -46,6 +92,45 @@ export default function LoginScreen() {
     setIsLoading(true);
     setErrorMsg("");
 
+    // =========================================================================
+    // TEMPORARY FRONTEND LOGIN LOGIC
+    // =========================================================================
+    if (USE_TEMPORARY_FRONTEND_LOGIN) {
+      setTimeout(async () => {
+        const matchedUser = HARDCODED_USERS.find(
+          (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === pass
+        );
+
+        if (matchedUser) {
+          // Temporary frontend user object structure
+          const tempUserObj = {
+            id: matchedUser.id,
+            name: matchedUser.name,
+            email: matchedUser.email,
+            role: matchedUser.role,
+          };
+
+          // Store mock tokens to maintain session consistency without backend
+          await setTokens(
+            `temp-access-token-${matchedUser.role}`,
+            `temp-refresh-token-${matchedUser.role}`
+          );
+
+          setIsLoading(false);
+
+          // Route to appropriate dashboard based on user role
+          router.replace(matchedUser.targetRoute);
+        } else {
+          setIsLoading(false);
+          setErrorMsg("Invalid email or password.");
+        }
+      }, 300);
+      return;
+    }
+
+    // =========================================================================
+    // BACKEND LOGIN LOGIC (Preserved untouched for re-enabling later)
+    // =========================================================================
     try {
       const data = await apiFetch("/auth/login", {
         method: "POST",

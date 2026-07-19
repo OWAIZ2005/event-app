@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const EventCard = ({ onPress }) => {
+const EventCard = ({ onPress }: { onPress?: () => void }) => {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.85}>
       <View style={styles.card}>

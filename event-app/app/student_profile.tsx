@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,7 +8,8 @@ import {
   Image,
   ActivityIndicator,
   TextInput,
-  Alert
+  Alert,
+  ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from 'expo-image-picker';
@@ -16,7 +18,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ThemedText } from "@/components/themed-text";
 import { Colors, Spacing, Radii, Shadows } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { apiFetch, clearTokens, getAccessToken } from "@/utils/apiClient";
+import { apiFetch, clearTokens, getAccessToken, API_BASE_URL } from "@/utils/apiClient";
 
 export default function StudentProfileScreen() {
   const colorScheme = useColorScheme();
@@ -30,6 +32,48 @@ export default function StudentProfileScreen() {
     queryFn: () => apiFetch("/users/me"),
   });
 
+  const [name, setName] = useState("");
+  const [department, setDepartment] = useState("");
+  const [yearOfStudy, setYearOfStudy] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setDepartment(user.department || "");
+      setYearOfStudy(user.yearOfStudy ? String(user.yearOfStudy) : "");
+    }
+  }, [user]);
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const parsedYear = yearOfStudy ? parseInt(yearOfStudy, 10) : undefined;
+      
+      const token = await getAccessToken();
+      const res = await fetch(`${API_BASE_URL}/users/me`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          department: department || null,
+          yearOfStudy: parsedYear || null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to update profile');
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      Alert.alert("Success", "Profile updated successfully!");
+    },
+    onError: (err: any) => {
+      Alert.alert("Error", err.message || "Failed to update profile");
+    }
+  });
+
   const uploadMutation = useMutation({
     mutationFn: async (imageUri: string) => {
       const formData = new FormData();
@@ -40,7 +84,7 @@ export default function StudentProfileScreen() {
       formData.append('profilePicture', { uri: imageUri, name: filename, type } as any);
       
       const token = await getAccessToken();
-      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api'}/users/me`, {
+      const res = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -95,47 +139,36 @@ export default function StudentProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.flex}>
+      <ScrollView style={styles.flex} contentContainerStyle={{ paddingHorizontal: Spacing.xl, paddingVertical: Spacing.xxl }} keyboardShouldPersistTaps="handled">
         <View style={styles.glowTop} pointerEvents="none" />
 
         {/* Avatar Circle */}
-        <TouchableOpacity 
-          style={[
-            styles.avatarCircle,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.primary,
-              overflow: 'hidden'
-            },
-          ]}
-          onPress={pickImage}
-          disabled={uploadMutation.isPending}
-        >
-          {user.profilePictureUrl ? (
-            <Image source={{ uri: user.profilePictureUrl }} style={{ width: '100%', height: '100%' }} />
-          ) : (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{ color: colors.primary, fontWeight: 'bold' }}>+</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-        
-        {uploadMutation.isPending && <Text style={{ color: colors.text, marginBottom: Spacing.md }}>Uploading...</Text>}
-
-        {/* Username Field */}
-        <View
-          style={[
-            styles.infoField,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          <ThemedText style={styles.infoText}>{user.name}</ThemedText>
+        <View style={{ alignItems: "center", marginBottom: Spacing.xl }}>
+          <TouchableOpacity 
+            style={[
+              styles.avatarCircle,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.primary,
+                overflow: 'hidden'
+              },
+            ]}
+            onPress={pickImage}
+            disabled={uploadMutation.isPending}
+          >
+            {user.profilePictureUrl ? (
+              <Image source={{ uri: user.profilePictureUrl }} style={{ width: '100%', height: '100%' }} />
+            ) : (
+              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: colors.primary, fontWeight: 'bold', fontSize: 32 }}>+</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          {uploadMutation.isPending && <Text style={{ color: colors.text, marginTop: Spacing.sm }}>Uploading...</Text>}
         </View>
 
-        {/* Email Field */}
+        {/* Full Name */}
+        <Text style={styles.label}>FULL NAME</Text>
         <View
           style={[
             styles.infoField,
@@ -145,10 +178,31 @@ export default function StudentProfileScreen() {
             },
           ]}
         >
-          <ThemedText style={styles.infoText}>{user.email}</ThemedText>
+          <TextInput
+            style={[styles.infoText, { color: colors.text, height: '100%' }]}
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter full name"
+            placeholderTextColor={SUBTEXT}
+          />
+        </View>
+
+        {/* Email Field (Read-only) */}
+        <Text style={styles.label}>EMAIL ADDRESS (Read-only)</Text>
+        <View
+          style={[
+            styles.infoField,
+            {
+              backgroundColor: colors.surface + "80",
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <Text style={[styles.infoText, { color: colors.text, opacity: 0.6 }]}>{user.email}</Text>
         </View>
 
         {/* Department Field */}
+        <Text style={styles.label}>DEPARTMENT</Text>
         <View
           style={[
             styles.infoField,
@@ -158,8 +212,53 @@ export default function StudentProfileScreen() {
             },
           ]}
         >
-          <ThemedText style={styles.infoText}>{user.department || "No Department Set"}</ThemedText>
+          <TextInput
+            style={[styles.infoText, { color: colors.text, height: '100%' }]}
+            value={department}
+            onChangeText={setDepartment}
+            placeholder="Enter department name"
+            placeholderTextColor={SUBTEXT}
+          />
         </View>
+
+        {/* Year of Study Field */}
+        <Text style={styles.label}>YEAR OF STUDY</Text>
+        <View
+          style={[
+            styles.infoField,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <TextInput
+            style={[styles.infoText, { color: colors.text, height: '100%' }]}
+            value={yearOfStudy}
+            onChangeText={setYearOfStudy}
+            placeholder="Enter year of study (1-5)"
+            placeholderTextColor={SUBTEXT}
+            keyboardType="numeric"
+            maxLength={1}
+          />
+        </View>
+
+        {/* Save Changes Button */}
+        <TouchableOpacity
+          style={[
+            styles.changePasswordButton,
+            Shadows.medium,
+          ]}
+          onPress={() => saveMutation.mutate()}
+          disabled={saveMutation.isPending}
+          activeOpacity={0.8}
+        >
+          {saveMutation.isPending ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={[styles.changePasswordText, { color: "#fff" }]}>Save Changes</Text>
+          )}
+        </TouchableOpacity>
 
         {/* Settings Button */}
         <TouchableOpacity
@@ -174,9 +273,7 @@ export default function StudentProfileScreen() {
           <Text style={[styles.changePasswordText, { color: colors.text }]}>Settings & Security</Text>
         </TouchableOpacity>
 
-
-
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

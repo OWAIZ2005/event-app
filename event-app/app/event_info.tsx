@@ -66,6 +66,13 @@ export default function EventInfoScreen() {
     },
   });
 
+  const { data: favorites } = useQuery<any[]>({
+    queryKey: ["favorites"],
+    queryFn: () => apiFetch("/users/favorites"),
+  });
+
+  const isFavorited = favorites?.some((fav: any) => fav.id === id) || false;
+
   const registerClick = useMutation({
     mutationFn: () => apiFetch(`/events/${id}/click`, { method: "POST" }),
     onSuccess: () => {
@@ -258,8 +265,8 @@ export default function EventInfoScreen() {
       {/* Bottom Buttons */}
       <View style={styles.bottomRow}>
         <TouchableOpacity style={styles.remindBtn} activeOpacity={0.8} onPress={() => toggleFavorite.mutate()}>
-          <Ionicons name="heart-outline" size={17} color={GREEN_DIM} />
-          <Text style={styles.remindText}>{toggleFavorite.isPending ? "Updating..." : "Favorite"}</Text>
+          <Ionicons name={isFavorited ? "heart" : "heart-outline"} size={17} color={GREEN_DIM} />
+          <Text style={styles.remindText}>{toggleFavorite.isPending ? "Updating..." : (isFavorited ? "Favorited" : "Favorite")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.registerBtn} activeOpacity={0.85} onPress={() => registerClick.mutate()}>

@@ -10,11 +10,12 @@ import {
   View,
   Image,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { Radii, Shadows, Spacing } from "../../constants/theme";
 import * as ImagePicker from "expo-image-picker";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch, getAccessToken } from "../../utils/apiClient";
+import { apiFetch, getAccessToken, API_BASE_URL } from "../../utils/apiClient";
 
 const BLACK = "#0A0A0A";
 const SURFACE = "#141414";
@@ -96,7 +97,7 @@ export default function EditEvent() {
       const endpoint = isEditing ? `/events/${id}` : "/events";
       const method = isEditing ? "PUT" : "POST";
 
-      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL || "http://localhost:5000/api"}${endpoint}`, {
+      const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         method,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -114,6 +115,44 @@ export default function EditEvent() {
       router.back();
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const token = await getAccessToken();
+      const res = await fetch(`${API_BASE_URL}/events/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to delete event");
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myClub"] });
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      router.back();
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error.message || "Failed to delete event");
+    }
+  });
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Event",
+      "Are you sure you want to delete this event? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Delete", 
+          style: "destructive", 
+          onPress: () => deleteMutation.mutate() 
+        }
+      ]
+    );
+  };
 
   if (isFetching) {
     return (
@@ -191,6 +230,21 @@ export default function EditEvent() {
           />
         </View>
 
+        {isEditing && (
+          <TouchableOpacity 
+            style={styles.deleteBtn} 
+            activeOpacity={0.8} 
+            onPress={handleDelete}
+            disabled={deleteMutation.isPending}
+          >
+            {deleteMutation.isPending ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.deleteBtnText}>Delete Event</Text>
+            )}
+          </TouchableOpacity>
+        )}
+
         <View style={{ height: 80 }} />
       </ScrollView>
 
@@ -250,4 +304,20 @@ const styles = StyleSheet.create({
   saveBtnText: { color: "#fff", fontSize: 16, fontWeight: "800", letterSpacing: 0.5 },
   arrowBadge: { position: "absolute", right: Spacing.md, width: 32, height: 32, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.15)", alignItems: "center", justifyContent: "center" },
   arrowText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  deleteBtn: {
+    height: 52,
+    backgroundColor: "rgba(229, 57, 53, 0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(229, 57, 53, 0.3)",
+    borderRadius: Radii.md,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: Spacing.md,
+    marginTop: Spacing.md,
+  },
+  deleteBtnText: {
+    color: "#E53935",
+    fontSize: 15,
+    fontWeight: "700",
+  },
 });

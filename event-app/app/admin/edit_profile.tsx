@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch, getAccessToken } from "../../utils/apiClient";
+import { apiFetch, getAccessToken, API_BASE_URL } from "../../utils/apiClient";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -83,7 +83,7 @@ export default function AdminProfileScreen() {
       }
 
       const token = await getAccessToken();
-      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL || "http://localhost:5000/api"}/clubs/${club.id}`, {
+      const res = await fetch(`${API_BASE_URL}/clubs/${club.id}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

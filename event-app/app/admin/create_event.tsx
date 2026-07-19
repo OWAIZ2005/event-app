@@ -11,7 +11,11 @@ import {
     TouchableOpacity,
     useWindowDimensions,
     View,
+    Image,
+    ActivityIndicator,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import { apiFetch, getAccessToken, API_BASE_URL } from "@/utils/apiClient";
 
 // ── Theme tokens (mirrored from AdminDashboard) ──────────────────────────────
 const BLACK = "#0A0A0A";
@@ -44,10 +48,71 @@ export default function CreateEvent() {
   const [date, setDate]         = useState("");
   const [location, setLocation] = useState("");
   const [details, setDetails]   = useState("");
+  const [bannerImage, setBannerImage] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
-  const handleCreate = () => {
-    // TODO: wire up your actual create logic / API call here
-    router.back();
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Permission to access library is required!');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setBannerImage(result.assets[0].uri);
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!title.trim() || !location.trim() || !details.trim()) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("date", date ? new Date(date).toISOString() : new Date().toISOString());
+      formData.append("venue", location);
+      formData.append("category", "General");
+      formData.append("description", details);
+      formData.append("isPublished", "true");
+
+      if (bannerImage) {
+        const filename = bannerImage.split("/").pop();
+        const match = /\.(\w+)$/.exec(filename || "");
+        const type = match ? `image/${match[1]}` : `image`;
+        formData.append("poster", { uri: bannerImage, name: filename, type } as any);
+      }
+
+      const token = await getAccessToken();
+      const res = await fetch(`${API_BASE_URL}/events`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.message || "Failed to create event");
+
+      alert("Event created successfully!");
+      router.back();
+    } catch (e: any) {
+      alert(e.message || "An error occurred");
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -78,12 +143,16 @@ export default function CreateEvent() {
         </View>
 
         <View style={styles.cardBlock}>
-          <TouchableOpacity activeOpacity={0.75}>
+          <TouchableOpacity activeOpacity={0.75} onPress={pickImage}>
             <View style={[styles.largeCard, { height: bannerHeight }]}>
-              <View style={styles.uploadHint}>
-                <FontAwesome name="pencil-square-o" size={28} color={GREEN_DIM} />
-                <Text style={styles.uploadText}>Tap to add banner</Text>
-              </View>
+              {bannerImage ? (
+                <Image source={{ uri: bannerImage }} style={{ width: "100%", height: "100%", borderRadius: Radii.lg }} resizeMode="cover" />
+              ) : (
+                <View style={styles.uploadHint}>
+                  <FontAwesome name="pencil-square-o" size={28} color={GREEN_DIM} />
+                  <Text style={styles.uploadText}>Tap to add banner</Text>
+                </View>
+              )}
             </View>
           </TouchableOpacity>
         </View>
@@ -161,8 +230,13 @@ export default function CreateEvent() {
         style={styles.fab}
         activeOpacity={0.85}
         onPress={handleCreate}
+        disabled={isCreating}
       >
-        <FontAwesome name="check" size={22} color="#fff" />
+        {isCreating ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <FontAwesome name="check" size={22} color="#fff" />
+        )}
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

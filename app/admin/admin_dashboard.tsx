@@ -1,6 +1,11 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useRef } from "react";
 import {
+  Alert,
+  Animated,
+  Image,
+  PanResponder,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,18 +14,120 @@ import {
   View,
 } from "react-native";
 import { Radii, Shadows } from "../../constants/theme";
+import { useClubEvents } from "@/context/ClubEventContext";
 
 const BLACK = "#0A0A0A";
 const SURFACE = "#141414";
 const BORDER = "#1E1E1E";
 const GREEN = "#1CB944";
 const GREEN_DIM = "#4CAF50";
-const SUBTEXT = "#555555";
+const SUBTEXT = "#A0A0A0";
 const TEXT = "#F5F5F5";
+
+function SwipeableEventCard({
+  children,
+  onDeleteConfirm,
+}: {
+  children: React.ReactNode;
+  onDeleteConfirm: () => void;
+}) {
+  const pan = useRef(new Animated.Value(0)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return (
+          gestureState.dx > 10 &&
+          Math.abs(gestureState.dx) > Math.abs(gestureState.dy)
+        );
+      },
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dx > 0) {
+          pan.setValue(gestureState.dx);
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx > 100) {
+          Alert.alert(
+            "Delete Event",
+            "Are you sure you want to delete this event? This action cannot be undone.",
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+                onPress: () => {
+                  Animated.spring(pan, {
+                    toValue: 0,
+                    useNativeDriver: true,
+                  }).start();
+                },
+              },
+              {
+                text: "Delete",
+                style: "destructive",
+                onPress: () => {
+                  Animated.timing(pan, {
+                    toValue: 500,
+                    duration: 200,
+                    useNativeDriver: true,
+                  }).start(() => {
+                    onDeleteConfirm();
+                  });
+                },
+              },
+            ],
+            {
+              cancelable: true,
+              onDismiss: () => {
+                Animated.spring(pan, {
+                  toValue: 0,
+                  useNativeDriver: true,
+                }).start();
+              },
+            }
+          );
+        } else {
+          Animated.spring(pan, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
+  return (
+    <View style={styles.swipeContainer}>
+      <Animated.View
+        style={[
+          styles.deleteIndicator,
+          {
+            opacity: pan.interpolate({
+              inputRange: [0, 50],
+              outputRange: [0, 1],
+              extrapolate: "clamp",
+            }),
+          },
+        ]}
+      >
+        <FontAwesome name="trash" size={20} color="#FF4D4D" />
+        <Text style={styles.deleteIndicatorText}>Delete</Text>
+      </Animated.View>
+
+      <Animated.View
+        style={{ transform: [{ translateX: pan }] }}
+        {...panResponder.panHandlers}
+      >
+        {children}
+      </Animated.View>
+    </View>
+  );
+}
 
 export default function AdminDashboard() {
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const { clubEvents, deleteClubEvent } = useClubEvents();
 
   const smallCardSize = width * 0.32;
   const largeCardHeight = width * 0.45;
@@ -63,21 +170,63 @@ export default function AdminDashboard() {
           <Text style={styles.sectionTitle}>My Events</Text>
         </View>
 
-        {Array.from({ length: 5 }).map((_, index) => (
-          <View key={index} style={styles.cardBlock}>
-            <TouchableOpacity
-              activeOpacity={0.75}
-              onPress={() => router.push("/admin/edit_event" as any)}
-            >
-              <View style={[styles.largeCard, { height: largeCardHeight }]}>
-                {/* Edit badge */}
-                <TouchableOpacity style={styles.editBtn} activeOpacity={0.8}>
-                  <Text style={styles.editText}>Edit</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
+        {clubEvents.length === 0 ? (
+          <View style={styles.emptyBox}>
+            <Text style={styles.emptyText}>No events created yet.</Text>
           </View>
-        ))}
+        ) : (
+          clubEvents.map((event) => (
+            <SwipeableEventCard
+              key={event.id}
+              onDeleteConfirm={() => deleteClubEvent(event.id)}
+            >
+              <TouchableOpacity
+                activeOpacity={0.75}
+                onPress={() =>
+                  router.push({
+                    pathname: "/admin/create_event",
+                    params: { id: event.id },
+                  } as any)
+                }
+              >
+                <View style={[styles.largeCard, { height: largeCardHeight }]}>
+                  {event.bannerImage ? (
+                    <Image
+                      source={{ uri: event.bannerImage }}
+                      style={StyleSheet.absoluteFillObject}
+                      resizeMode="cover"
+                    />
+                  ) : null}
+
+                  <View style={styles.cardOverlay}>
+                    <View style={{ flex: 1, paddingRight: 8 }}>
+                      <Text style={styles.cardTitle} numberOfLines={1}>
+                        {event.title}
+                      </Text>
+                      <Text style={styles.cardSub} numberOfLines={1}>
+                        {event.date} • {event.venue}
+                      </Text>
+                    </View>
+
+                    {/* Edit badge */}
+                    <TouchableOpacity
+                      style={styles.editBtn}
+                      activeOpacity={0.8}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/admin/create_event",
+                          params: { id: event.id },
+                        } as any)
+                      }
+                    >
+                      <Text style={styles.editText}>Edit</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </SwipeableEventCard>
+          ))
+        )}
 
         {/* Bottom padding for FAB */}
         <View style={{ height: 90 }} />
@@ -143,6 +292,27 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
 
+  swipeContainer: {
+    position: "relative",
+    marginHorizontal: 20,
+    marginBottom: 14,
+  },
+  deleteIndicator: {
+    position: "absolute",
+    left: 16,
+    top: 0,
+    bottom: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    zIndex: 0,
+  },
+  deleteIndicatorText: {
+    color: "#FF4D4D",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+
   cardBlock: {
     marginHorizontal: 20,
     marginBottom: 14,
@@ -155,6 +325,26 @@ const styles = StyleSheet.create({
     borderColor: "rgba(28,185,68,0.3)",
     justifyContent: "flex-end",
     padding: 12,
+    overflow: "hidden",
+  },
+  cardOverlay: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    backgroundColor: "rgba(10,10,10,0.75)",
+    padding: 10,
+    borderRadius: Radii.md,
+  },
+  cardTitle: {
+    color: TEXT,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  cardSub: {
+    color: SUBTEXT,
+    fontSize: 12,
+    fontWeight: "500",
+    marginTop: 2,
   },
   editBtn: {
     alignSelf: "flex-end",
@@ -169,6 +359,21 @@ const styles = StyleSheet.create({
     color: GREEN_DIM,
     fontSize: 12,
     fontWeight: "600",
+  },
+  emptyBox: {
+    paddingVertical: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 20,
+    borderRadius: Radii.lg,
+    backgroundColor: SURFACE,
+    borderWidth: 1,
+    borderColor: "rgba(28,185,68,0.15)",
+  },
+  emptyText: {
+    color: SUBTEXT,
+    fontSize: 14,
+    fontWeight: "500",
   },
 
   fab: {
@@ -186,3 +391,4 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
   },
 });
+

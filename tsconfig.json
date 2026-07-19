@@ -4,7 +4,7 @@
     "strict": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -17,5 +17,10 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
+  ],
+  "exclude": [
+    "event-app",
+    "node_modules",
+    "backend"
   ]
 }

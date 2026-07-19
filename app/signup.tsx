@@ -1,6 +1,8 @@
 import { Radii, Shadows, Spacing } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { apiFetch, setTokens } from "@/utils/apiClient";
+import { jwtDecode } from "jwt-decode";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -23,21 +25,62 @@ const SUBTEXT = "#666666";
 const TEXT = "#F5F5F5";
 
 export default function SignUpScreen() {
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [department, setDepartment] = useState("");
   const [yearOfStudy, setYearOfStudy] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"club" | "student">("student");
+  const [role, setRole] = useState<"CLUB_ADMIN" | "STUDENT">("STUDENT");
 
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const router = useRouter();
 
-  const handleSignUp = () => {
-    if (role === "club") {
-      router.replace("/admin/admin_dashboard" as any);
-    } else {
-      router.replace("/(tabs)");
+  const handleSignUp = async () => {
+    if (!name || !email || !password || !confirmPassword) {
+      setErrorMsg("Please fill in all required fields.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setErrorMsg("Passwords do not match.");
+      return;
+    }
+    if (password.length < 6) {
+      setErrorMsg("Password must be at least 6 characters.");
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMsg("");
+
+    try {
+      const data = await apiFetch("/auth/signup", {
+        method: "POST",
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          password, 
+          department: department || undefined, 
+          yearOfStudy: yearOfStudy ? parseInt(yearOfStudy, 10) : undefined, 
+          role 
+        }),
+      });
+
+      await setTokens(data.accessToken, data.refreshToken);
+      
+      const userPayload: any = jwtDecode(data.accessToken);
+      if (userPayload.role === "CLUB_ADMIN" || userPayload.role === "SUPER_ADMIN") {
+        router.replace("/admin/admin_dashboard" as any);
+      } else {
+        router.replace("/(tabs)");
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to create account");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,19 +110,39 @@ export default function SignUpScreen() {
               <Text style={styles.headingBig}>Create{"\n"}account.</Text>
             </View>
 
-            {/* Username */}
-            <Text style={styles.label}>USERNAME</Text>
-            <View style={inputStyle("username")}>
+            {errorMsg ? (
+              <Text style={{ color: "#E53935", marginBottom: Spacing.md, fontSize: 13, fontWeight: "600" }}>{errorMsg}</Text>
+            ) : null}
+
+            {/* Full Name */}
+            <Text style={styles.label}>FULL NAME *</Text>
+            <View style={inputStyle("name")}>
               <TextInput
                 style={styles.input}
-                placeholder="Enter username"
+                placeholder="Enter full name"
                 placeholderTextColor={SUBTEXT}
-                value={username}
-                onChangeText={setUsername}
-                onFocus={() => setFocusedField("username")}
+                value={name}
+                onChangeText={(t) => { setName(t); setErrorMsg(""); }}
+                onFocus={() => setFocusedField("name")}
                 onBlur={() => setFocusedField(null)}
-                autoCapitalize="none"
                 maxLength={50}
+              />
+            </View>
+
+            {/* Email */}
+            <Text style={styles.label}>EMAIL ADDRESS *</Text>
+            <View style={inputStyle("email")}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter email address"
+                placeholderTextColor={SUBTEXT}
+                value={email}
+                onChangeText={(t) => { setEmail(t); setErrorMsg(""); }}
+                onFocus={() => setFocusedField("email")}
+                onBlur={() => setFocusedField(null)}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                maxLength={100}
               />
             </View>
 
@@ -115,7 +178,7 @@ export default function SignUpScreen() {
             </View>
 
             {/* Password */}
-            <Text style={styles.label}>PASSWORD</Text>
+            <Text style={styles.label}>PASSWORD *</Text>
             <View style={inputStyle("password")}>
               <TextInput
                 style={styles.input}
@@ -123,8 +186,24 @@ export default function SignUpScreen() {
                 placeholderTextColor={SUBTEXT}
                 secureTextEntry
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(t) => { setPassword(t); setErrorMsg(""); }}
                 onFocus={() => setFocusedField("password")}
+                onBlur={() => setFocusedField(null)}
+                maxLength={100}
+              />
+            </View>
+
+            {/* Confirm Password */}
+            <Text style={styles.label}>CONFIRM PASSWORD *</Text>
+            <View style={inputStyle("confirmPassword")}>
+              <TextInput
+                style={styles.input}
+                placeholder="Re-enter password"
+                placeholderTextColor={SUBTEXT}
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={(t) => { setConfirmPassword(t); setErrorMsg(""); }}
+                onFocus={() => setFocusedField("confirmPassword")}
                 onBlur={() => setFocusedField(null)}
                 maxLength={100}
               />
@@ -136,17 +215,17 @@ export default function SignUpScreen() {
               <TouchableOpacity
                 style={[
                   styles.roleBtn,
-                  role === "student"
+                  role === "STUDENT"
                     ? styles.roleBtnActive
                     : styles.roleBtnInactive,
                 ]}
-                onPress={() => setRole("student")}
+                onPress={() => setRole("STUDENT")}
                 activeOpacity={0.8}
               >
                 <Text
                   style={[
                     styles.roleBtnText,
-                    { color: role === "student" ? "#fff" : GREEN_DIM },
+                    { color: role === "STUDENT" ? "#fff" : GREEN_DIM },
                   ]}
                 >
                   Student
@@ -156,17 +235,17 @@ export default function SignUpScreen() {
               <TouchableOpacity
                 style={[
                   styles.roleBtn,
-                  role === "club"
+                  role === "CLUB_ADMIN"
                     ? styles.roleBtnActive
                     : styles.roleBtnInactive,
                 ]}
-                onPress={() => setRole("club")}
+                onPress={() => setRole("CLUB_ADMIN")}
                 activeOpacity={0.8}
               >
                 <Text
                   style={[
                     styles.roleBtnText,
-                    { color: role === "club" ? "#fff" : GREEN_DIM },
+                    { color: role === "CLUB_ADMIN" ? "#fff" : GREEN_DIM },
                   ]}
                 >
                   Club
@@ -180,10 +259,12 @@ export default function SignUpScreen() {
               onPress={handleSignUp}
               activeOpacity={0.85}
             >
-              <Text style={styles.signupBtnText}>Create Account</Text>
-              <View style={styles.arrowBadge}>
-                <Text style={styles.arrowText}>→</Text>
-              </View>
+              <Text style={styles.signupBtnText}>{isLoading ? "Creating..." : "Create Account"}</Text>
+              {!isLoading && (
+                <View style={styles.arrowBadge}>
+                  <Text style={styles.arrowText}>→</Text>
+                </View>
+              )}
             </TouchableOpacity>
 
             {/* Back to login */}

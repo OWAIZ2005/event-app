@@ -1,6 +1,6 @@
 import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { Radii, Shadows, Spacing } from "../../constants/theme";
+import { useClubEvents } from "@/context/ClubEventContext";
 
 const BLACK = "#0A0A0A";
 const SURFACE = "#141414";
@@ -23,17 +24,60 @@ const TEXT = "#F5F5F5";
 
 export default function EditEvent() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ id?: string }>();
+  const { clubEvents, updateClubEvent } = useClubEvents();
 
-  const [eventName, setEventName] = useState("Tech Conference 2026");
-  const [organizer, setOrganizer] = useState("John Doe");
-  const [dateTime, setDateTime] = useState("May 15, 2026 • 2:00 PM");
-  const [venue, setVenue] = useState("Grand Convention Hall, NYC");
+  const existingEvent = params.id
+    ? clubEvents.find((evt) => evt.id === params.id)
+    : undefined;
+
+  const [eventName, setEventName] = useState(
+    existingEvent ? existingEvent.title : "Tech Conference 2026"
+  );
+  const [organizer, setOrganizer] = useState(
+    existingEvent?.organizer || "Tech Club"
+  );
+  const [dateTime, setDateTime] = useState(
+    existingEvent ? existingEvent.date : "May 15, 2026 • 2:00 PM"
+  );
+  const [venue, setVenue] = useState(
+    existingEvent ? existingEvent.venue : "Grand Convention Hall, NYC"
+  );
   const [participants, setParticipants] = useState("250");
-  const [payment, setPayment] = useState("$50.00 per ticket");
+  const [payment, setPayment] = useState("Free Entry");
   const [eventLink, setEventLink] = useState("www.techconf2026.com");
   const [description, setDescription] = useState(
-    "Join us for an exciting tech conference where industry leaders share insights on emerging technologies, AI, and digital transformation.",
+    existingEvent
+      ? existingEvent.description
+      : "Join us for an exciting tech conference where industry leaders share insights on emerging technologies, AI, and digital transformation."
   );
+
+  useEffect(() => {
+    if (existingEvent) {
+      setEventName(existingEvent.title);
+      setOrganizer(existingEvent.organizer || "Tech Club");
+      setDateTime(existingEvent.date);
+      setVenue(existingEvent.venue);
+      setDescription(existingEvent.description);
+    }
+  }, [existingEvent]);
+
+  const handleSave = () => {
+    if (existingEvent) {
+      updateClubEvent({
+        ...existingEvent,
+        title: eventName.trim(),
+        organizer: organizer.trim(),
+        date: dateTime.trim(),
+        venue: venue.trim(),
+        description: description.trim(),
+      });
+      alert("Event updated successfully!");
+    } else {
+      alert("Changes saved!");
+    }
+    router.back();
+  };
 
   return (
     <View style={styles.screen}>
@@ -120,7 +164,7 @@ export default function EditEvent() {
 
       {/* Sticky Save button — mirrors Login button */}
       <View style={styles.saveBar}>
-        <TouchableOpacity style={styles.saveBtn} activeOpacity={0.85}>
+        <TouchableOpacity style={styles.saveBtn} activeOpacity={0.85} onPress={handleSave}>
           <Text style={styles.saveBtnText}>Save</Text>
           <View style={styles.arrowBadge}>
             <Text style={styles.arrowText}>→</Text>

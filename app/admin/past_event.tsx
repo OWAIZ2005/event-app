@@ -1,6 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -34,11 +35,10 @@ export default function PastEventScreen() {
       >
         {/* Banner */}
         <View style={[styles.banner, { height: bannerHeight }]}>
-          <FontAwesome
-            name="image"
-            size={40}
-            color={TEXT}
-            style={{ opacity: 0.15 }}
+          <Image
+            source={require("@/assets/images/event_banner.jpg")}
+            style={{ width: "100%", height: "100%", borderRadius: Radii.lg }}
+            resizeMode="cover"
           />
         </View>
 
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
     borderColor: BORDER,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
   greenBox: {
     backgroundColor: GREEN_SOFT,

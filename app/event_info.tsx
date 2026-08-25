@@ -2,6 +2,7 @@ import { Radii, Shadows, Spacing } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -70,11 +71,10 @@ export default function EventInfoScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Event Image */}
         <View style={styles.imageBox}>
-          <Ionicons
-            name="image-outline"
-            size={48}
-            color={GREEN}
-            style={{ opacity: 0.3 }}
+          <Image
+            source={require("@/assets/images/event_banner.jpg")}
+            style={{ width: "100%", height: "100%" }}
+            resizeMode="cover"
           />
         </View>
 

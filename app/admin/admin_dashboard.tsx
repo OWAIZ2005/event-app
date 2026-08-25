@@ -1,6 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
@@ -48,11 +49,13 @@ export default function AdminDashboard() {
               activeOpacity={0.75}
               onPress={() => router.push("/admin/past_event" as any)}
             >
-              <View
+              <ImageBackground
+                source={require("../../assets/images/highlight_card.jpg")}
                 style={[
                   styles.smallCard,
                   { width: smallCardSize, height: smallCardSize },
                 ]}
+                imageStyle={{ borderRadius: Radii.lg }}
               />
             </TouchableOpacity>
           ))}
@@ -69,12 +72,16 @@ export default function AdminDashboard() {
               activeOpacity={0.75}
               onPress={() => router.push("/admin/edit_event" as any)}
             >
-              <View style={[styles.largeCard, { height: largeCardHeight }]}>
+              <ImageBackground
+                source={require("../../assets/images/event_banner.jpg")}
+                style={[styles.largeCard, { height: largeCardHeight }]}
+                imageStyle={{ borderRadius: Radii.lg }}
+              >
                 {/* Edit badge */}
                 <TouchableOpacity style={styles.editBtn} activeOpacity={0.8}>
                   <Text style={styles.editText}>Edit</Text>
                 </TouchableOpacity>
-              </View>
+              </ImageBackground>
             </TouchableOpacity>
           </View>
         ))}

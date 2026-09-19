@@ -50,6 +50,10 @@ app.get("/", (req: Request, res: Response) => {
 // Global Error Handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  logger.info(`Server is running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    logger.info(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

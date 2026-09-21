@@ -42,8 +42,8 @@ app.use("/api/clubs", clubRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
 
-// Basic health check route
-app.get("/", (req: Request, res: Response) => {
+// Basic health check routes
+app.get(["/", "/api"], (req: Request, res: Response) => {
   res.status(200).json(new ApiResponse(200, null, "Event App API is running!"));
 });
 

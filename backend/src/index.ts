@@ -18,6 +18,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust Vercel's reverse proxy (required for rate-limiting & IP detection)
+app.set('trust proxy', 1);
+
 // Security Middlewares
 app.use(helmet());
 app.use(cors());
@@ -50,7 +53,7 @@ app.get(["/", "/api"], (req: Request, res: Response) => {
 // Global Error Handler
 app.use(errorHandler);
 
-if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     logger.info(`Server is running on http://localhost:${PORT}`);
   });
